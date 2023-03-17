@@ -4,3 +4,5 @@ build/
 web/
 dist/
 **/.vscode
+*/*.pyd
+*/*.so
