@@ -4,5 +4,6 @@ build/
 web/
 dist/
 **/.vscode
-*/*.pyd
+diverge/*.pyd
 */*.so
+.ipynb_checkpoints/
