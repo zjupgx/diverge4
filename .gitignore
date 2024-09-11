@@ -1,0 +1,9 @@
+*.egg-info/
+build/
+论文/
+web/
+dist/
+**/.vscode
+diverge/*.pyd
+*/*.so
+.ipynb_checkpoints/

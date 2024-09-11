@@ -1,0 +1,172 @@
+CLUSTAL X (1.81) multiple sequence alignment
+
+
+AF025670.MCH2                       --------------------------------------------------
+MMCASP6.CASP-6                      --------------------------------------------------
+HSU20536.MCH2                       --------------------------------------------------
+AF082329.PE1                        --------------------------------------------------
+ICE_DROME                           --------------------------------------------------
+SFU81510.PE1                        --------------------------------------------------
+RNU49930.LICE                       --------------------------------------------------
+RNU58656.PE1                        --------------------------------------------------
+MMCASP3.CASP-3                      --------------------------------------------------
+CGU27463.CPP-32                     --------------------------------------------------
+HSU13737.PE1                        --------------------------------------------------
+HSU13738.PE1                        --------------------------------------------------
+AF083029.PE1                        --------------------------------------------------
+
+AF025670.MCH2                       --------------------------------------------------
+MMCASP6.CASP-6                      --------------------------------------------------
+HSU20536.MCH2                       --------------------------------------------------
+AF082329.PE1                        --------------------------------------------------
+ICE_DROME                           --------------------------------------------------
+SFU81510.PE1                        --------------------------------------------------
+RNU49930.LICE                       --------------------------------------------------
+RNU58656.PE1                        --------------------------------------------------
+MMCASP3.CASP-3                      --------------------------------------------------
+CGU27463.CPP-32                     --------------------------------------------------
+HSU13737.PE1                        --------------------------------------------------
+HSU13738.PE1                        --------------------------------------------------
+AF083029.PE1                        --------------------------------------------------
+
+AF025670.MCH2                       --------------------------------------------------
+MMCASP6.CASP-6                      --------------------------------------------------
+HSU20536.MCH2                       --------------------------------------------------
+AF082329.PE1                        --------------------------------------------------
+ICE_DROME                           -----------------------------------------------MDA
+SFU81510.PE1                        ----------------------------------------------MLDG
+RNU49930.LICE                       --------------------------------------------------
+RNU58656.PE1                        --------------------------------------------------
+MMCASP3.CASP-3                      --------------------------------------------------
+CGU27463.CPP-32                     --------------------------------------------------
+HSU13737.PE1                        --------------------------------------------------
+HSU13738.PE1                        --------------------------------------------------
+AF083029.PE1                        --------------------------------------------------
+
+AF025670.MCH2                       --------------------------------------------------
+MMCASP6.CASP-6                      --------------------------------------------------
+HSU20536.MCH2                       -MSSA------------SGLRRGHPAGGEE-------N------------
+AF082329.PE1                        -MSGAERRPAAGRVQLDSKPTPTTTADGNQ-------N------------
+ICE_DROME                           TNNGESADQVGIRVGNPEQPNDHTDALGSVGSGGAGSSGLVAGSSHPYG-
+SFU81510.PE1                        KQDNGNVDSVDIKQRTNGG-GDEGDALGSN------SS------------
+RNU49930.LICE                       ------MD----------NNETSVDSKS----------------------
+RNU58656.PE1                        ------MD----------NNETSVDSKS----------------------
+MMCASP3.CASP-3                      ------ME----------NNKTSVDSKS----------------------
+CGU27463.CPP-32                     ------ME----------NNETSVDSKS----------------------
+HSU13737.PE1                        ------ME----------NTENSVDSKS----------------------
+HSU13738.PE1                        ------ME----------NTENSVDSKS----------------------
+AF083029.PE1                        -MMTDIKDGPR-------SGEDVSDARS----------------------
+
+AF025670.MCH2                       ----------MTETDG---FYR----S---REVLDP--------------
+MMCASP6.CASP-6                      ----------MTETDG---FYK----S---REVFDP--------------
+HSU20536.MCH2                       ----------MTETDA---FYK--------REMFDP--------------
+AF082329.PE1                        ----------ITEVDA---FDK--------RRTFDP--------------
+ICE_DROME                           SGAIGQLANGYSSPSS---SYRKNVA----KMVTDRH-------------
+SFU81510.PE1                        -----------SQPN--------RVA----RMPVDRN-------------
+RNU49930.LICE                       ----------INNFET---KTIHGSK----SMDSGIYL------------
+RNU58656.PE1                        ----------INNFET---KTIHG------SQVDGIYL------------
+MMCASP3.CASP-3                      ----------INNFEV---KTIHGSK----SVDSGIYL------------
+CGU27463.CPP-32                     ----------IKNFEV---KTIHGSK----SMDSGIYL------------
+HSU13737.PE1                        ----------IKNLEP---KIIHGSE----SMDSGISL------------
+HSU13738.PE1                        ----------IKNLEP---KIIHGSE----SMDSGISL------------
+AF083029.PE1                        ----------FPGSKG---MNLPASK----SVDSGILP------------
+
+AF025670.MCH2                       ----------------------------A----EQYKMDHKRR---GTAL
+MMCASP6.CASP-6                      ----------------------------A----EQYKMDHKRR---GVAL
+HSU20536.MCH2                       ----------------------------A----EKYKMDHRRR---GIAL
+AF082329.PE1                        ----------------------------A----EQYKMNHQRR---GVAL
+ICE_DROME                           ----------------------------A----AEYNMRHKNR---GMAL
+SFU81510.PE1                        ----------------------------A----PYYNMNHKHR---GMAI
+RNU49930.LICE                       ----------------------------D----SSYKMDYPEM---GLCI
+RNU58656.PE1                        ----------------------------D----SSYKMDYPEM---GLCI
+MMCASP3.CASP-3                      ----------------------------D----SSYKMDYPEM---GICI
+CGU27463.CPP-32                     ----------------------------D----SSYKMDYPEM---GVCI
+HSU13737.PE1                        ----------------------------D----NSYKMDYPEM---GLCI
+HSU13738.PE1                        ----------------------------D----NSYKMDYPEM---GLCI
+AF083029.PE1                        ----------------------------D----DSYRMDYPEI---GVCV
+
+AF025670.MCH2                       IFNHERFFWHL-------ALPERRGTNADRDNPTRRFSELGFEVKCFNDL
+MMCASP6.CASP-6                      IFNHERFFWHL-------TLPERRGTNADRDNLTRRFSDLGFEVKCFNDL
+HSU20536.MCH2                       IFNHERFFWHL-------TLPERRRTCADRDNLTRRFSDLGFEVKCFNDL
+AF082329.PE1                        IFNHEHFFWHL-------RLPDRRGTLADRNNLKRSLTDLGFEVRIFDDL
+ICE_DROME                           IFNHEHFEVP--------TLKSRAGTNVDCENLTRVLKQLDFEVTVYKDC
+SFU81510.PE1                        IFNHEHFDIH--------SLKSRTGTNVDSDNLSKVLKTLGFKVTVFPNL
+RNU49930.LICE                       IINNKNFHKST-------GMSARNGTDVDAANLRETFMALKYEVRNKNDL
+RNU58656.PE1                        IINNKNFHKST-------GMSARNGTDVDAANLRETFMALKYEVRNKNDL
+MMCASP3.CASP-3                      IINNKNFHKST-------GMSSRSGTDVDAANLRETFMGLKYQVRNKNDL
+CGU27463.CPP-32                     IINNKNFHKST-------GMTPRSGTDVDAAKLRETFMALKYEVRNKNDL
+HSU13737.PE1                        IINNKNFHKST-------GMTSRSGTDVDAANLRETFRNLKYEVRNKNDL
+HSU13738.PE1                        IINNKNFHKST-------GMTSRSGTDVDAANLRETFRNLKYEVRNKNDL
+AF083029.PE1                        IINNKNFHRDT-------GLSSRSGTDADAASVREVFMKLGYKVKLNNDL
+
+AF025670.MCH2                       RAEELLLKIHEVST---SSHVDADCFLCVFLSHGEG-------NHIYAYD
+MMCASP6.CASP-6                      RAEELLLKIHEVST---SSHIDADCFICVFLSHGEG-------NHVYAYD
+HSU20536.MCH2                       KAEELLLKIHEVST---VSHADADCFVCVFLSHGEG-------NHIYAYD
+AF082329.PE1                        KAEDVLKKVFEASR---DDYSNADCFVCVFLSHGEN-------DHVYAYD
+ICE_DROME                           RYKDILRTIEYSAS---QNHSDSDCILVAILSHGEM-------GYIYAKD
+SFU81510.PE1                        KSEEINKFIQQTAE---MDHSDADCLLVAVLTHGEL-------GMLYAKD
+RNU49930.LICE                       TREEIMELMDSVSK---EDHSKRSSFVCVILSHGDE-------GVIFGTN
+RNU58656.PE1                        TREEIMELMDSVSK---EDHSKRSSFVCVILSHGDE-------GVIFGTN
+MMCASP3.CASP-3                      TREDILELMDSVSK---EDHSKRSSFVCVILSHGDE-------GVIYGTN
+CGU27463.CPP-32                     TREEIVELMKNASK---EDHSKRSSFVCVILSHGDE-------GVIFGTD
+HSU13737.PE1                        TREEIVELMRDVSK---EDHSKRSSFVCVLLSHGEE-------GIIFGTN
+HSU13738.PE1                        TREEIVELMRDVSK---EDHSKRSSFVCVLLSHGEE-------GIIFGTN
+AF083029.PE1                        SSRDIFKLLKNVSE---EDHSKRSSFVCVLLSHGDE-------GLFYGTD
+
+AF025670.MCH2                       A----------KIEIQTLTGLFKGDKCQSLVGKPKIFIIQACRGSQHDVP
+MMCASP6.CASP-6                      A----------KIEIQTLTGLFKGDKCQSLVGKPKIFIIQACRGSQHDVP
+HSU20536.MCH2                       A----------KIEIQTLTGLFKGDKCHSLVGKPKIFIIQACRGNQHDVP
+AF082329.PE1                        A----------QIKIETITNMFRGDKCQSLVGKPKIFIIQACRGDKHDDP
+ICE_DROME                           T----------QYKLDNIWSFFTANHCPSLAGKPKLFFIQACQGDRLDGG
+SFU81510.PE1                        T----------HYKPDNLWYYFTADKCPTLAGKPKLFFIQACQGDRLDGG
+RNU49930.LICE                       G----------PVDLKKLTSFFRGDYCRSLTGKPKLFIIQACRGTELDCG
+RNU58656.PE1                        G----------PVDLKKLTSFFRGDYCRSLTGKPKLFIIQACRGTELDCG
+MMCASP3.CASP-3                      G----------PVELKKLTSFFRGDYCRSLTGKPKLFIIQACRGTELDCG
+CGU27463.CPP-32                     G----------PIDLKKLTSYFRGDYCRSLIGKPKLFIIQACRGTELDCG
+HSU13737.PE1                        G----------PVDLKKITNFFRGDRCRSLTGKPKLFIIQACRGTELDCG
+HSU13738.PE1                        G----------PVDLKKITNFFRGDRCRSLTGKPKLFIIQACRGTELDCG
+AF083029.PE1                        G----------PLELKVLTSLFRGDKCRSLAGKPKLFFIQACRGTELDSG
+
+AF025670.MCH2                       LVPLDVVDHQTDKLDDN----------VTQVDAAS----VYTLPAGADFL
+MMCASP6.CASP-6                      VVPLDMVDHQTDKLDN-----------VTQVDAAS----VYTLPAGADFL
+HSU20536.MCH2                       VIPLDVVDNQTEKLDTN----------ITEVDAAS----VYTLPAGADFL
+AF082329.PE1                        VLVQDSVDSKDETTVN-----------QTEVDAAG----VYTLPAGADFI
+ICE_DROME                           VTMQRSQ----TETDG---------------DSSM----SYKIPVHADFL
+SFU81510.PE1                        ITLSR------TETDG---------------SPST----SYRIPVHADFL
+RNU49930.LICE                       IETDSG---------T--------------DDDMA----CQKIPVEADFL
+RNU58656.PE1                        IETDSG---------T--------------DDDMA----CQKIPVEADFL
+MMCASP3.CASP-3                      IETDSG---------T--------------DEEMA----CQKIPVEADFL
+CGU27463.CPP-32                     IETDSG---------T--------------EDDMT----CQKIPVEADFL
+HSU13737.PE1                        IETDSG---------V--------------DDDMA----CHKIPVDADFL
+HSU13738.PE1                        IETDSG---------V--------------DDDMA----CHKIPVEADFL
+AF083029.PE1                        IEADSG------------------------PDETV----CQKIPVEADFL
+
+AF025670.MCH2                       MCYSVAEGYYSHRETVNGSWYIQDLSEMLARHGSS-LEFTELLTLVNRKV
+MMCASP6.CASP-6                      MCYSVAEGYYSHRETVNGSWYIQDLCEMLARYGSS-LEFTELLTLVNRKV
+HSU20536.MCH2                       MCYSVAEGYYSHRETVNGSWYIQDLCEMLGKYGSS-LEFTELLTLVNRKV
+AF082329.PE1                        MCYSVAQGYFSHRETVNGSWYIQDLCEALGKHGSS-LEFTELLTVVNRKV
+ICE_DROME                           IAYSTVPGFYSWRNTTRGTWFMQSLCAELAANGKR-LDILTLLTFVCQRV
+SFU81510.PE1                        IAFSTVPGYFSWRNTTRGSWFMQALCEELRYAGTE-RDILTLLTFVCQKV
+RNU49930.LICE                       YAYSTAPGYYSWRNSRDGSWFIQSLCAMLKLYAHK-LEFMHILTRVNRKV
+RNU58656.PE1                        YAYSTAPGYYSWRNSRDGSWFIQSLCAMLKLYAHK-LEFMHIITRVNRKV
+MMCASP3.CASP-3                      YAYSTAPGYYSWRNSKDGSWFIQSLCSMLKLYAHK-LEFMHILTRVNRKV
+CGU27463.CPP-32                     YAYSTAPGYYSWRNPKDGSWFIQSLCSMLKLYAHK-LEFMHILTRVNRKV
+HSU13737.PE1                        YAYSTAPGYYSWRNSKDGSWFIQSLCAMLKQYADK-LEFMHILTRVNRKV
+HSU13738.PE1                        YAYSTAPGYYSWRNSKDGSWFIQSLCAMLKQYADK-LEFMHILTRVNRKV
+AF083029.PE1                        YAYSTAPGYYSWRNAAEGSWFIQSLCRMLKEHARK-LELMQILTRVNRRV
+
+AF025670.MCH2                       SQRRVDFCKDPGAIGK-KQVPCFASMLTKKLHFCPKPSK-----
+MMCASP6.CASP-6                      SQRRVDFCKDPDAIGK-KQVPCFASMLTKKLHFCPKPSK-----
+HSU20536.MCH2                       SQRRVDFCKDPSAIGK-KQVPCFASMLTKKLHFFPKSN------
+AF082329.PE1                        SHRKVDICRDINAIGK-KQIPCFASMLTKKLYFHPKSK------
+ICE_DROME                           AVDFESCTPDTPEMHQQKQIPCITTMLTRILRFSDKQLAPAGRV
+SFU81510.PE1                        ALDFESNAPDSAMMHQQKQVPCITSMLTRLLVFGKKQSH-----
+RNU49930.LICE                       ATEFESFSLDATFHAK-KQIPCIVSMLTKELYFYH---------
+RNU58656.PE1                        ATEFESFSLDATFHAK-KQIPC----------------------
+MMCASP3.CASP-3                      ATEFESFSLDSTFHAK-KQIPCIVSMLTKELYFYH---------
+CGU27463.CPP-32                     ATEFESFSLDSTFHAK-KQIPCIVSMLTKELYFYH---------
+HSU13737.PE1                        ATEFESFSFDATFHAK-KQIPCIVSMLTKELYFYH---------
+HSU13738.PE1                        ATEFESFSFDATFHAK-KQIPCIVSMLTKELYFYH---------
+AF083029.PE1                        A-EYESCSTRQDFNAK-KQIPCIVSMLTKEFYFPC---------
+
+
