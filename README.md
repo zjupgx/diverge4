@@ -4,6 +4,8 @@
 
 DIVERGE v4 is a Python package designed for large-scale analysis of functional divergence across multi-gene families. It is an upgrade of the widely used DIVERGE software, incorporating a modular Python structure and a user-friendly web server. This package allows for the identification of amino acid sites undergoing significant evolutionary shifts, helping to uncover functional divergence after gene duplication.
 
+![framework](.\statics\framework.jpg)
+
 ## Features
 
 - **Modular Python package**: Built for scalability, with 10 customizable modules for functional divergence analysis.
