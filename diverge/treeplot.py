@@ -153,20 +153,12 @@ def draw_phylogenetic_tree(tree):
         showlegend=False,
         paper_bgcolor='white',
     )
-    # 绘制进化树
     fig = go.Figure(data=[scatter], layout=layout)
     draw_clade(clade_dict,fig,tree.root, 0)
     clade_name_dict = {}
     for k,v in clade_dict.items():
         clade_name_dict[k.name] = v
     return fig,clade_name_dict,tree
-    # selected_points = plotly_events(fig, click_event=True, hover_event=False,override_height=600,override_width="130%")
-    # selected_clade = get_clade_name(clade_dict,[selected_points[0]['x'],selected_points[0]['y']])[0]
-    # if selected_clade is not None:
-    #     return tree,selected_clade
-    # else:
-    #     return tree,None
-
   
   
 

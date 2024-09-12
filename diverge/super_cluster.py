@@ -8,15 +8,9 @@ from tqdm import tqdm
 from Bio.Phylo.TreeConstruction import DistanceCalculator
 from Bio.Phylo.TreeConstruction import DistanceMatrix
 from Bio.Phylo.TreeConstruction import DistanceTreeConstructor
-# from .utils import create_temp_folder,write_temp_tree,remove_temp_folder
-# from .binding import Gu99,Type2
 from diverge import Gu99,Type2
 from diverge.utils import printv,tqdm_joblib
 from joblib import Parallel, delayed
-
-
-
-# temp_folder = create_temp_folder()
 
 def aln_read(aln_file):
   try:

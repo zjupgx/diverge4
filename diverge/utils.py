@@ -244,14 +244,6 @@ def tree_construct(aln,method='nj',dist_calc='identity'):
         clade.name = None
     return tree
 
-# def tree_construct2(aln,dist_calc='identity'):
-#     calculator = DistanceCalculator(dist_calc)
-#     constructor = DistanceTreeConstructor()
-#     dm = calculator.get_distance(aln)
-#     tree = constructor.nj(dm)
-#     for clade in tree.get_nonterminals():
-#         clade.name = None
-#     return tree,dm
 
 def aln_to_tree(aln_file,method='nj'):
     try:
@@ -359,40 +351,6 @@ def split_tree(tree_file,n_clusters=2,height=None):
 
     return sub_trees,root_distance
 
-
-# write split tree into files (split by distance mtx)
-# def write_split_subtree(tree_file,n_clusters,path):
-#     sub_trees,_ = split_tree(tree_file,n_clusters)
-#     for i in range(1,n_clusters+1):
-#         tree = BaseTree.Tree.from_clade(sub_trees[i-1])
-#         Phylo.write(sub_trees[i],os.path.join(path,f'subtree{i}'),'newick')
-
-# def create_temp_folder():
-#     temp_folder = tempfile.TemporaryDirectory()
-#     printv("generate temp folder: ",temp_folder.name," for storing temp files")
-#     return temp_folder
-
-# def write_temp_tree(tree,temp_folder,tree_name='temp_tree',subdir=None):
-#     if subdir is not None:
-#         temp_tree_path = os.path.join(temp_folder.name,subdir,tree_name+'.tree')
-#         if not os.path.exists(os.path.dirname(temp_tree_path)):
-#             os.mkdir(os.path.join(temp_folder.name,subdir))
-#     else:
-#         temp_tree_path = os.path.join(temp_folder.name,tree_name+'.tree')
-#     Phylo.write(tree,temp_tree_path,'newick')
-#     return temp_tree_path
-
-# def remove_temp_folder(temp_folder):
-#     while 1:
-#         if not os.path.exists(temp_folder):
-#             break
-#         try:
-#             shutil.rmtree(temp_folder)
-#         except PermissionError as e:
-#             err_file_path = str(e).split("\'", 2)[1]
-#             if os.path.exists(err_file_path):
-#                 os.chmod(err_file_path, stat.S_IWUSR)
-
 def plot_msa(aln,aln_format='clustal',color_scheme="None",marker_list=None,wrap_length=60,show_grid=True,show_plot=True,save_plot=False,path="./msa.png",marker='v',marker_color="red"):
     mv=MsaViz(aln,color_scheme=color_scheme,wrap_length=wrap_length,show_grid=show_grid, format =aln_format)
     if marker_list is not None:
@@ -447,7 +405,6 @@ def view_cutoff_msa2(aln_path,results,colname,color_scheme="None",cutoff=0.5,sho
     mv = plot_msa(aln,aln_format=aln_format,marker_list=marker_list,show_grid=show_grid,show_plot=show_plot,save_plot=save_plot,path=path,marker=marker,color_scheme=color_scheme,marker_color=marker_color)
     return mv
 
-
 def pre_check_tree(*tree_files):
     for tree_file in tree_files:
         tree = Phylo.read(tree_file, 'newick')
@@ -491,8 +448,7 @@ def get_genefam_clusters(tree_obj,gene_fam,exclude_list=[],exclude_level=1):
             subtree = Phylo.BaseTree.Tree.from_clade(subtree_clade)
             tree_list.extend([subtree])
         return tree_list,gene_fam.keys()
-    
-    
+       
 def printv(*text,show_time=True,verbose=True):
     """Prints text with time and verbose.
 
@@ -504,7 +460,6 @@ def printv(*text,show_time=True,verbose=True):
     if verbose:
         if show_time: print(time.ctime()+"\t",*text)
         else:print(*text)
-
 
 @contextlib.contextmanager
 def tqdm_joblib(*args, **kwargs):

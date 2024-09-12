@@ -75,8 +75,6 @@ setup(
     packages=find_packages(),
     cmdclass={"build_ext": build_ext},
     zip_safe=False,
-    # python_requires='==3.10.*',
     install_requires = requires_packages,
-    
 )
 

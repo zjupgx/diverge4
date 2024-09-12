@@ -13,20 +13,11 @@ def read_tree(tree_file):
             tree = Phylo.read(tree_file, 'nexus')
         except ValueError:
             raise ValueError(f"Tree file '{tree_file}' is not in newick or nexus format.")
-    # set brach length to 1 for all clade
-    # for clade in tree.get_nonterminals():
-    #     clade.branch_length = 1
     return tree
 
 def get_colnames(r_names):
     columns_names = []
     for name in r_names:
-        # if os.path.isfile(name):
-        #     col_name = os.path.basename(name)
-        #     # col_name = os.path.splitext(col_name)[1]
-        # else:
-        #     col_name = name
-        # columns_names.extend([col_name])
         columns_names.extend([name])
     return columns_names
 
@@ -35,7 +26,6 @@ def load_tree_file(tree_file,check=True):
     if check:
         check_tree(tree)
     return tree.format("newick").strip("\n")
-
 
 def check_tree_file(*tree_files):
     for tree_file in tree_files:
@@ -321,6 +311,7 @@ class Effective():
         return results
     def _help(self):
         print(help(_effectivecpp))
+        
 class Fdr():
     def __init__(self,aln_file,*tree_files,cluster_name=None,trees:list=[]) -> None:
         """__init__ 
@@ -365,7 +356,8 @@ class Fdr():
         results = results.set_index(results.columns[0],drop=True)
         return results
     def _help(self):
-        print(help(_fdrcpp))     
+        print(help(_fdrcpp))
+        
 class Rvs():
     def __init__(self,aln_file,*tree_files,cluster_name=None,trees:list=[]) -> None:
         """__init__ 
@@ -416,6 +408,7 @@ class Rvs():
         return results
     def _help(self):
         print(help(_rvscpp))
+        
 class TypeOneAnalysis():
     """
     A class for type one analysis
@@ -474,6 +467,8 @@ class TypeOneAnalysis():
         return results
     def _help(self):
         print(help(_typeOneAnalysiscpp))
+        
+        
 if __name__ == "__main__":
     # test gu99
     T = Gu99("../test_data/CASP.aln", "../test_data/cl1.tree", "../test_data/cl2.tree","../test_data/cl3.tree")
