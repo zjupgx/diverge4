@@ -75,8 +75,8 @@ def tree_reconstruct(dm,cluster):
   return tree1,tree2
 
 def get_cluster(aln,*tree_files,trees:list=[]):
-  dm,tree = tree_construct(aln)
-  tree_cluster = [0]*len(dm.names)
+  names = [record.id for record in aln]
+  tree_cluster = [0]*len(names)
   i = 1
   tree_dict = {}
   if trees!=[]:
@@ -84,7 +84,7 @@ def get_cluster(aln,*tree_files,trees:list=[]):
       tree_id = f"subtree_{i}"
       tree_dict[i] = tree_id
       tree_terminal = [i.name for i in tree.get_terminals()]
-      t_list = [dm.names.index(j) for j in tree_terminal]
+      t_list = [names.index(j) for j in tree_terminal]
       for k in t_list: 
         tree_cluster[k] = i
       i +=1
@@ -94,7 +94,7 @@ def get_cluster(aln,*tree_files,trees:list=[]):
       tree_id = os.path.basename(tree_file).split('.')[0]
       tree_dict[i] = tree_id
       tree_terminal = [i.name for i in tree.get_terminals()]
-      t_list = [dm.names.index(j) for j in tree_terminal]
+      t_list = [names.index(j) for j in tree_terminal]
       for k in t_list: 
         tree_cluster[k] = i
       i +=1
