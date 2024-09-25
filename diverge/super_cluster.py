@@ -1,4 +1,3 @@
-from typing import Any
 from Bio import Phylo,AlignIO
 import pandas as pd
 import numpy as np
@@ -22,6 +21,13 @@ def aln_read(aln_file):
       print("==============\n",aln_file,"==============\n")
       raise Exception("The alignment file is not in fasta or clustal format")
   return aln
+
+def pre_check_tree(trees):
+    for tree in trees:
+      tree_depth = max([len(tree.trace(tree.root,clade)) for clade in tree.get_terminals()])
+      if tree_depth < 3:
+        return False  
+    return True
 
 def tree_construct(aln,dist_calc='identity'):
   calculator = DistanceCalculator(dist_calc)
@@ -141,14 +147,18 @@ def get_super_cluster_list(aln, *tree_files, trees: list = []):
     return super_cluster_list, group_list, tree_dict
 
 def process_tree(aln_file, super_cluster, sp_type):
-    if sp_type == 1:
-        calculator = Gu99(aln_file, trees=super_cluster)
+    if pre_check_tree(super_cluster):
+      if sp_type == 1:
+          calculator = Gu99(aln_file, trees=super_cluster)
+      else:
+          calculator = Type2(aln_file, trees=super_cluster)
+      summary = calculator.summary()
+      position = calculator.results().index.values.tolist()
+      results = calculator.results().values.tolist()
+      return results, position, summary
     else:
-        calculator = Type2(aln_file, trees=super_cluster)
-    summary = calculator.summary()
-    position = calculator.results().index.values.tolist()
-    results = calculator.results().values.tolist()
-    return results, position, summary
+      print(f'tree depth is less than 3, please check your tree file')
+      return None, None, None
   
 def get_super_cluster_pp(aln_file, *tree_files, sp_type: int = 1, trees: list = [],verbose=True):
     aln = aln_read(aln_file)
