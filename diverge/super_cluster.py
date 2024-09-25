@@ -11,7 +11,7 @@ from Bio.Phylo.TreeConstruction import DistanceTreeConstructor
 from diverge import Gu99,Type2
 from diverge.utils import printv,tqdm_joblib
 from joblib import Parallel, delayed
-
+from multiprocessing import Pool
 def aln_read(aln_file):
   try:
     aln = AlignIO.read(aln_file, 'clustal')
@@ -106,17 +106,39 @@ def re_clean_tree(tree):
   # return tree.root_at_midpoint()
   return tree
 
-def get_super_cluster_list(aln,*tree_files,trees:list=[]):
-  tree_cluster,cluster_num,tree_dict = get_cluster(aln,*tree_files,trees=trees)
-  cluster_list,group_list = sep_cluster(tree_cluster,cluster_num)
-  dm,_ = tree_construct(aln)
-  super_cluster_list = []
-  for cluster in cluster_list:
-    tree1,tree2 = tree_reconstruct(dm,cluster)
-    tree1 = re_clean_tree(tree1)
-    tree2 = re_clean_tree(tree2)
-    super_cluster_list.extend([[tree1,tree2]])
-  return super_cluster_list,group_list,tree_dict
+# def get_super_cluster_list(aln,*tree_files,trees:list=[]):
+#   tree_cluster,cluster_num,tree_dict = get_cluster(aln,*tree_files,trees=trees)
+#   cluster_list,group_list = sep_cluster(tree_cluster,cluster_num)
+#   dm,_ = tree_construct(aln)
+#   super_cluster_list = []
+#   for cluster in cluster_list:
+#     tree1,tree2 = tree_reconstruct(dm,cluster)
+#     tree1 = re_clean_tree(tree1)
+#     tree2 = re_clean_tree(tree2)
+#     super_cluster_list.extend([[tree1,tree2]])
+#   return super_cluster_list,group_list,tree_dict
+
+
+def get_super_cluster_list(aln, *tree_files, trees: list = []):
+    tree_cluster, cluster_num, tree_dict = get_cluster(aln, *tree_files, trees=trees)
+    cluster_list, group_list = sep_cluster(tree_cluster, cluster_num)
+    dm, _ = tree_construct(aln)
+    # Determine the number of CPU cores to use
+    num_cores = os.cpu_count()
+    # Create a pool of worker processes
+    with Pool(processes=num_cores) as pool:
+        # Use starmap to parallelize the tree reconstruction
+        super_cluster_list = pool.starmap(
+            tree_reconstruct, 
+            [(dm, cluster) for cluster in cluster_list]
+        )
+    # Clean the trees
+    super_cluster_list = [
+        [re_clean_tree(tree1), re_clean_tree(tree2)] 
+        for tree1, tree2 in super_cluster_list
+    ]
+    
+    return super_cluster_list, group_list, tree_dict
 
 def process_tree(aln_file, super_cluster, sp_type):
     if sp_type == 1:
