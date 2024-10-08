@@ -7,7 +7,7 @@ from pybind11 import get_cmake_dir
 from glob import glob
 import sys
 
-__version__ = "4.0.0"
+__version__ = "4.0.1"
 requires_packages = [
     "numpy", "biopython", "pandas","pybind11"]
 ext_modules = [
