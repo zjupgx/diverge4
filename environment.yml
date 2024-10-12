@@ -1,0 +1,14 @@
+name: diverge
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pybind11
+  - scikit-bio
+  - biopython
+  - plotly
+  - pymsaviz
+  - tqdm
+  - matplotlib

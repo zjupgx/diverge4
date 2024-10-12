@@ -20,17 +20,17 @@ To install the DIVERGE v4 Python package, use pip:
 ```bash
 pip install diverge4
 ```
-If you prefer to compile the package from source using setup.py, you will need to install the pybind11 library, which provides the C++ bindings for Python used in this package. You can install it via pip:
-```bash
-pip install pybind11
-```
-Once `pybind11` is installed, you can compile DIVERGE v4 by running the following commands:
+Alternatively, you can compile the package from source. 
 ```bash
 git clone https://github.com/zjupgx/diverge4.git
-cd diverge4
-python setup.py install
 ```
-`pybind` is necessary because `DIVERGE v4` uses C++ for its core data structures and computationally intensive tasks, which are exposed to Python via `pybind11`.
+You can compile DIVERGE v4 by running the following commands:
+```bash
+cd diverge4
+conda env create -f environment.yml
+pip install -e .
+```
+**Note:** `pybind11` is necessary because `DIVERGE v4` uses C++ for its core data structures and computationally intensive tasks, which are exposed to Python via `pybind11`.
 ## Quick Start
 
 ### Example Usage

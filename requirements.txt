@@ -1,0 +1,12 @@
+biopython
+joblib
+matplotlib
+numpy
+pandas
+plotly
+pybind11
+pymsaviz
+scikit_bio
+scipy
+setuptools
+tqdm
