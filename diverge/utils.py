@@ -1,153 +1,166 @@
-from .binding import Gu99,Gu2001,Type2,Fdr,Effective,Asym,TypeOneAnalysis,Rvs
-import pandas as pd
+from typing import List, Optional, Dict, Any, Tuple, Generator, Union
+import os
 import numpy as np
-from Bio import Phylo
-from Bio import AlignIO
+import pandas as pd
+import matplotlib.pyplot as plt
+from Bio import Phylo, AlignIO
 from Bio.Phylo import BaseTree
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from scipy.cluster.hierarchy import linkage, cut_tree, dendrogram, fcluster
 from scipy.spatial.distance import squareform
 from pymsaviz import MsaViz
-import os
-# import tempfile
-# import shutil,stat
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 import time
 import contextlib
 import joblib
 from tqdm.autonotebook import tqdm
-import copy 
+import copy
 
-class CalPipe():
-    """CalPipe class
-    wrap some calculate pipeline of diverge
+from .binding import (
+    Gu99, Gu2001, Type2, Fdr, Effective, Asym, TypeOneAnalysis, Rvs
+)
+
+class CalPipe:
     """
-    def __init__(self,aln_file,*tree_files,) -> None:
+    CalPipe class: Wrap some calculate pipeline of diverge.
+    """
+
+    def __init__(self, aln_file: str, *tree_files: str) -> None:
         """
-        __init__ 
-        :param aln_file: alingnment file
-        :param pipe: some calculate pipeline mode, defaults to 'mode1'
-          mode1: tree without branch_length,two clusters : gu99,type2,fdr,effective
-          mode2: tree without branch_length,at least three clusters : gu99,type2,fdr,functional distance
-          mode3: tree with branch_length,two clusters : gu99,gu2001,type2,fdr,effective
-          mode4: tree with branch_length,at least three clusters : gu99,gu2001,type2,fdr,functional distance
-        :param _result_summary: result summary dict
+        Initialize CalPipe.
+
+        Args:
+            aln_file (str): Alignment file path
+            *tree_files (str): Tree file paths
+        """
+        self._validate_files(aln_file, *tree_files)
+        self.func_dict = {
+            'Gu99': True, 'Gu2001': False, 'Type2': True, 'Fdr': True,
+            'Effective': False, 'FunDist': False, 'Type1Analysis': False, 'Asym': False
+        }
+        self.tree_files = tree_files
+        self.aln_file = aln_file
+        self._pipe_select(*self.tree_files)
+        self._pipeline()
+        self.result_summary = self._result_summary()
+        self.detail = [key for key, value in self.func_dict.items() if value]
+
+    def _validate_files(self, aln_file: str, *tree_files: str) -> None:
+        """
+        Validate existence of alignment and tree files.
+
+        Args:
+            aln_file (str): Alignment file path
+            *tree_files (str): Tree file paths
+
+        Raises:
+            ValueError: If any of the files does not exist
         """
         if not os.path.isfile(aln_file):
             raise ValueError(f"Alignment file '{aln_file}' does not exist.")
         for tree_file in tree_files:
             if not os.path.isfile(tree_file):
                 raise ValueError(f"Tree file '{tree_file}' does not exist.")
-        self.func_dict = {'Gu99':True,'Gu2001':False,'Type2':True,'Fdr':True,'Effective':False,'FunDist':False,'Type1Analysis':False,'Asym':False}
-        self.tree_files = tree_files
-        self.aln_file = aln_file
-        self._pipe_select(*self.tree_files)
-        self._pipeline()
-        self.result_summary = self._result_summary() 
-        self.detail = [key for key in self.func_dict.keys() if self.func_dict[key]==True]
-    def _pipe_select(self,*tree_files):
+
+    def _pipe_select(self, *tree_files: str) -> None:
+        """Select pipeline based on tree files."""
         cluster_num = len(tree_files)
         has_branch_length = _has_branch_length(*tree_files)
         if has_branch_length:
             self.func_dict['Gu2001'] = True
-        if cluster_num >=3:
+        if cluster_num >= 3:
             self.func_dict['FunDist'] = True
-        if cluster_num ==2:
+        if cluster_num == 2:
             self.func_dict['Effective'] = True
-        if cluster_num ==3:
+        if cluster_num == 3:
             self.func_dict['Asym'] = True
             self.func_dict['Type1Analysis'] = True
-    def _pipeline(self):
+
+    def _pipeline(self) -> None:
+        """Execute the calculation pipeline."""
         progress_bar = tqdm(total=sum(self.func_dict.values()), desc="Calculate pipeline")
-        if self.func_dict['Gu99']:
-            try:
-                gu99 = Gu99(self.aln_file,*self.tree_files)
-                self.gu99_results = gu99.results()
-                self.gu99_summary = gu99.summary()
-                progress_bar.update(1)
-                progress_bar.set_description("Gu99 calculation running...") 
-                progress_bar.refresh() 
-            except Exception as e:
-                printv(f"Error occurred during pipeline execution: {e}")
-                raise
-            if self.func_dict['FunDist']:
-                try:
-                    self.fundist_results = gu99.fundist()
-                    progress_bar.update(1)
-                    progress_bar.set_description("Function distance calculation running...") 
-                    progress_bar.refresh() 
-                except Exception as e:
-                    printv(f"Error occurred during pipeline execution: {e}")
-                    raise
-        if self.func_dict['Gu2001']:
-            try:
-                gu2001 = Gu2001(self.aln_file,*self.tree_files)
-                self.gu2001_results = gu2001.results()
-                self.gu2001_summary = gu2001.summary()
-                progress_bar.update(1)
-                progress_bar.set_description("Gu2001 distance calculation running...") 
-                progress_bar.refresh() 
-            except Exception as e:
-                printv(f"Error occurred during pipeline execution: {e}")
-                raise
-        if self.func_dict['Type1Analysis']:
-            try:
-                toa = TypeOneAnalysis(self.aln_file,*self.tree_files)
-                self.type1analysis_summary = toa.summary()
-                self.type1analysis_results = toa.results()
-                progress_bar.update(1)
-                progress_bar.set_description("Type one Analysis distance calculation running...") 
-                progress_bar.refresh()
-            except Exception as e:
-                printv(f"Error occurred during pipeline execution: {e}")
-                raise
-        if self.func_dict['Type2']:
-            try:
-                type2 = Type2(self.aln_file,*self.tree_files)
-                self.type2_summary = type2.summary()
-                self.type2_results = type2.results()
-                progress_bar.update(1)
-                progress_bar.set_description("Type two calculation running...") 
-                progress_bar.refresh()
-            except Exception as e:
-                printv(f"Error occurred during pipeline execution: {e}")
-                raise
-        if self.func_dict['Effective']:
-            try:
-                effective = Effective(self.aln_file,*self.tree_files)
-                self.type1_effective = effective.type1_results()
-                self.type2_effective = effective.type2_results()
-                progress_bar.update(1)
-                progress_bar.set_description("Effective number of site calculation running...") 
-                progress_bar.refresh()
-            except Exception as e:
-                printv(f"Error occurred during pipeline execution: {e}")
-                raise
-        if self.func_dict['Fdr']:
-            try:
-                fdr = Fdr(self.aln_file,*self.tree_files)
-                self.type1_fdr = fdr.type1_results()
-                self.type2_fdr = fdr.type2_results()
-                progress_bar.update(1)
-                progress_bar.set_description("Fdr calculation running...") 
-                progress_bar.refresh()
-            except Exception as e:
-                printv(f"Error occurred during pipeline execution: {e}")
-                raise
-        if self.func_dict['Asym']:
-            try:
-                asym = Asym(self.aln_file,*self.tree_files)
-                self.asym_results = asym.results()
-                progress_bar.update(1)
-                progress_bar.set_description("Asym test running...") 
-                progress_bar.refresh()
-            except Exception as e:
-                printv(f"Error occurred during pipeline execution: {e}")
-                raise
         
-    
-    def _result_summary(self):
+        calculation_methods = {
+            'Gu99': self._calculate_gu99,
+            'Gu2001': self._calculate_gu2001,
+            'Type1Analysis': self._calculate_type1analysis,
+            'Type2': self._calculate_type2,
+            'Effective': self._calculate_effective,
+            'Fdr': self._calculate_fdr,
+            'Asym': self._calculate_asym
+        }
+
+        for method, func in calculation_methods.items():
+            if self.func_dict[method]:
+                try:
+                    func(progress_bar)
+                except Exception as e:
+                    printv(f"Error occurred during {method} calculation: {e}")
+                    raise
+
+    def _calculate_gu99(self, progress_bar: tqdm) -> None:
+        gu99 = Gu99(self.aln_file, *self.tree_files)
+        self.gu99_results = gu99.results()
+        self.gu99_summary = gu99.summary()
+        progress_bar.update(1)
+        progress_bar.set_description("Gu99 calculation running...")
+        progress_bar.refresh()
+        
+        if self.func_dict['FunDist']:
+            self.fundist_results = gu99.fundist()
+            progress_bar.update(1)
+            progress_bar.set_description("Function distance calculation running...")
+            progress_bar.refresh()
+
+    def _calculate_gu2001(self, progress_bar: tqdm) -> None:
+        gu2001 = Gu2001(self.aln_file, *self.tree_files)
+        self.gu2001_results = gu2001.results()
+        self.gu2001_summary = gu2001.summary()
+        progress_bar.update(1)
+        progress_bar.set_description("Gu2001 distance calculation running...")
+        progress_bar.refresh()
+
+    def _calculate_type1analysis(self, progress_bar: tqdm) -> None:
+        toa = TypeOneAnalysis(self.aln_file, *self.tree_files)
+        self.type1analysis_summary = toa.summary()
+        self.type1analysis_results = toa.results()
+        progress_bar.update(1)
+        progress_bar.set_description("Type one Analysis distance calculation running...")
+        progress_bar.refresh()
+
+    def _calculate_type2(self, progress_bar: tqdm) -> None:
+        type2 = Type2(self.aln_file, *self.tree_files)
+        self.type2_summary = type2.summary()
+        self.type2_results = type2.results()
+        progress_bar.update(1)
+        progress_bar.set_description("Type two calculation running...")
+        progress_bar.refresh()
+
+    def _calculate_effective(self, progress_bar: tqdm) -> None:
+        effective = Effective(self.aln_file, *self.tree_files)
+        self.type1_effective = effective.type1_results()
+        self.type2_effective = effective.type2_results()
+        progress_bar.update(1)
+        progress_bar.set_description("Effective number of site calculation running...")
+        progress_bar.refresh()
+
+    def _calculate_fdr(self, progress_bar: tqdm) -> None:
+        fdr = Fdr(self.aln_file, *self.tree_files)
+        self.type1_fdr = fdr.type1_results()
+        self.type2_fdr = fdr.type2_results()
+        progress_bar.update(1)
+        progress_bar.set_description("Fdr calculation running...")
+        progress_bar.refresh()
+
+    def _calculate_asym(self, progress_bar: tqdm) -> None:
+        asym = Asym(self.aln_file, *self.tree_files)
+        self.asym_results = asym.results()
+        progress_bar.update(1)
+        progress_bar.set_description("Asym test running...")
+        progress_bar.refresh()
+
+    def _result_summary(self) -> Dict[str, Any]:
+        """Generate result summary."""
         _result_summary = {}
         if self.func_dict['Gu99']:
             _result_summary['gu99_summary'] = self.gu99_summary
@@ -172,64 +185,138 @@ class CalPipe():
         if self.func_dict['Asym']:
             _result_summary['asym_results'] = self.asym_results
         return _result_summary
-    def __str__(self):
+
+    def __str__(self) -> str:
+        """
+        String representation of CalPipe.
+
+        Returns:
+            str: A string describing the calculation pipeline and available results
+        """
         strtext = "Diverge calculation pipeline\n"
-        for i,j in enumerate(self.detail):
-            strtext += "step{}: {}\n".format(i+1,j)
+        for i, j in enumerate(self.detail):
+            strtext += f"step{i+1}: {j}\n"
         strtext += "#####################\n"
-        strtext += "You can get the result by calling the result_summary attribute or the specific attribute as follow:\n {}".format(self.result_summary.keys())
+        strtext += f"You can get the result by calling the result_summary attribute or the specific attribute as follow:\n {self.result_summary.keys()}"
         return strtext
+
     def __repr__(self) -> str:
+        """Representation of CalPipe."""
         return self.__str__()
 
-def _has_branch_length(*tree_files):
-    k = 0
-    # for tree_file in tree_files,check if check_tree(tree_file) is all true or all false
-    for tree_file in tree_files:
-        k += _check_tree(tree_file)
-    try:
-        k == len(tree_files) or k == 0
-    except:
-        ex = Exception('tree file error,please check your tree file')
-        raise ex
-    if k == len(tree_files):
-        return True
-    elif k == 0:
-        return False
+def _has_branch_length(*tree_files: str) -> bool:
+    """
+    Check if all tree files have branch lengths.
 
-def _check_tree(tree_file):
+    Args:
+        *tree_files (str): Tree file paths
+
+    Returns:
+        bool: True if all trees have branch lengths, False otherwise
+
+    Raises:
+        Exception: If there's an inconsistency in branch length presence across trees
+    """
+    k = sum(_check_tree(tree_file) for tree_file in tree_files)
+    if k not in (0, len(tree_files)):
+        raise Exception('Tree file error, please check your tree files')
+    return k == len(tree_files)
+
+def _check_tree(tree_file: str) -> bool:
+    """
+    Check if a tree file has branch lengths.
+
+    Args:
+        tree_file (str): Path to the tree file
+
+    Returns:
+        bool: True if the tree has branch lengths, False otherwise
+    """
     tree = Phylo.read(tree_file, 'newick')
-    has_branch_length = False
-    for clade in tree.find_clades():
-        if clade.branch_length:
-            has_branch_length = True
-            return has_branch_length
-    return has_branch_length
+    return any(clade.branch_length for clade in tree.find_clades())
 
-def plot_phylogenetic_tree(tree, font_size=5,figsize=(5,6)):
+def plot_phylogenetic_tree(tree: BaseTree.Tree, font_size: int = 5, figsize: Tuple[int, int] = (5, 6)) -> None:
+    """
+    Plot a phylogenetic tree.
+
+    Args:
+        tree (BaseTree.Tree): The phylogenetic tree to plot
+        font_size (int, optional): Font size for the plot. Defaults to 5.
+        figsize (Tuple[int, int], optional): Figure size. Defaults to (5, 6).
+    """
     plt.rc('font', size=font_size)
-    # set the size of the figure
     fig = plt.figure(figsize=figsize, dpi=400)
-    # alternatively
-    # fig.set_size_inches(10, 20)
     axes = fig.add_subplot(1, 1, 1)
     Phylo.draw(tree, axes=axes)
     plt.show()
 
-def read_tree(tree_file):
+def read_tree(tree_file: str) -> BaseTree.Tree:
+    """
+    Read a tree file in newick or nexus format.
+
+    Args:
+        tree_file (str): Path to the tree file
+
+    Returns:
+        BaseTree.Tree: The parsed phylogenetic tree
+
+    Raises:
+        ValueError: If the tree file is not in newick or nexus format
+    """
     try:
-        tree = Phylo.read(tree_file, 'newick')
+        return Phylo.read(tree_file, 'newick')
     except ValueError:
         try:
-            tree = Phylo.read(tree_file, 'nexus')
+            return Phylo.read(tree_file, 'nexus')
         except ValueError:
             raise ValueError(f"Tree file '{tree_file}' is not in newick or nexus format.")
-    # set brach length to 1 for all clade
-    # for clade in tree.get_nonterminals():
-    #     clade.branch_length = 1
-    return tree
 
-    
+def printv(*text: Any, show_time: bool = True, verbose: bool = True) -> None:
+    """
+    Print text with time and verbose.
+
+    Args:
+        *text (Any): Text to print
+        show_time (bool, optional): Whether to show time. Defaults to True.
+        verbose (bool, optional): Whether to print. Defaults to True.
+    """    
+    if verbose:
+        if show_time:
+            print(time.ctime() + "\t", *text)
+        else:
+            print(*text)
+
+@contextlib.contextmanager
+def tqdm_joblib(*args: Any, **kwargs: Any) -> Generator[tqdm, None, None]:
+    """
+    Context manager to patch joblib to report into tqdm progress bar.
+
+    Args:
+        *args (Any): Arguments for tqdm
+        **kwargs (Any): Keyword arguments for tqdm
+
+    Yields:
+        Generator[tqdm, None, None]: A tqdm progress bar object
+    """
+    tqdm_object = tqdm(*args, **kwargs)
+    class TqdmBatchCompletionCallback(joblib.parallel.BatchCompletionCallBack):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+
+        def __call__(self, *args: Any, **kwargs: Any) -> Any:
+            tqdm_object.update(n=self.batch_size)
+            return super().__call__(*args, **kwargs)
+
+    old_batch_callback = joblib.parallel.BatchCompletionCallBack
+    joblib.parallel.BatchCompletionCallBack = TqdmBatchCompletionCallback
+    try:
+        yield tqdm_object
+    finally:
+        joblib.parallel.BatchCompletionCallBack = old_batch_callback
+        tqdm_object.close()
+        
+        
+
 def tree_construct(aln,method='nj',dist_calc='identity'):
     calculator = DistanceCalculator(dist_calc)
     constructor = DistanceTreeConstructor()
@@ -264,7 +351,6 @@ def tree_to_dist(tree):
             if clade.name != other.name:
                 dist.loc[clade.name, other.name] = tree.distance(clade, other)
     return dist.fillna(0)
-
 
 def auto_split(aln_file,plot=False,exclude_level=1,dist_calc='blosum62',tree_construct_method='nj',cluster_method='ward',n_clusters=None,root_at_midpoint=True):
     printv("Running subtree auto split process")
@@ -327,7 +413,6 @@ def save_subtrees(subtrees, directory, format='newick'):
         filename = f"{directory}/subtree_{i}.{format}"
         Phylo.write(subtree, filename, format)
         printv(f"Subtree {i} saved as {filename}")
-
 
 # split tree into clusters by distance_mtx
 def split_tree(tree_file,n_clusters=2,height=None):
@@ -447,37 +532,3 @@ def get_genefam_clusters(tree_obj,gene_fam,exclude_list=[],exclude_level=1):
             subtree = Phylo.BaseTree.Tree.from_clade(subtree_clade)
             tree_list.extend([subtree])
         return tree_list,gene_fam.keys()
-       
-def printv(*text,show_time=True,verbose=True):
-    """Prints text with time and verbose.
-
-    :param show_time: defaults to True
-    :type show_time: bool, optional
-    :param verbose: defaults to True
-    :type verbose: bool, optional
-    """    
-    if verbose:
-        if show_time: print(time.ctime()+"\t",*text)
-        else:print(*text)
-
-@contextlib.contextmanager
-def tqdm_joblib(*args, **kwargs):
-    """Context manager to patch joblib to report into tqdm progress bar
-    given as argument"""
-    tqdm_object = tqdm(*args, **kwargs)
-    class TqdmBatchCompletionCallback(joblib.parallel.BatchCompletionCallBack):
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-
-        def __call__(self, *args, **kwargs):
-            tqdm_object.update(n=self.batch_size)
-            return super().__call__(*args, **kwargs)
-
-    old_batch_callback = joblib.parallel.BatchCompletionCallBack
-    joblib.parallel.BatchCompletionCallBack = TqdmBatchCompletionCallback
-    try:
-        yield tqdm_object
-    finally:
-        joblib.parallel.BatchCompletionCallBack = old_batch_callback
-        tqdm_object.close()
-        

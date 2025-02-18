@@ -1,3 +1,12 @@
-from .binding import *
-from .utils import CalPipe,plot_msa,split_tree
-__version__ = '1.0.0'
+from .binding import (
+    Gu99, Gu2001, Type2, Fdr, Effective, Asym, TypeOneAnalysis, Rvs
+)
+from .utils import (
+    CalPipe
+)
+from .super_cluster import SuperCluster
+from .treeplot import draw_phylogenetic_tree
+
+__version__ = '4.0.1'
+
+
