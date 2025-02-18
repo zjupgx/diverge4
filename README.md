@@ -157,6 +157,17 @@ If you use DIVERGE in your research, please cite:
 
 
 
+<div align="center">
+
+🌐 [Web Server](https://pgx.zju.edu.cn/diverge) &nbsp;|&nbsp; 
+📦 [GitHub](https://github.com/zjupgx/diverge4) &nbsp;|&nbsp;
+📚 [DIVERGE v3](https://github.com/zjupgx/diverge) &nbsp;|&nbsp;
+💡 [Issues](https://github.com/zjupgx/diverge4/issues) &nbsp;|&nbsp;
+📧 [Support](mailto:chenyc@zju.edu.cn)
+
+</div>
+
+
 ## License
 
 DIVERGE v4 is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
