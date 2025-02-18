@@ -2,7 +2,12 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org)
-[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](./Tutorial.ipynb)
+[![Downloads](https://pepy.tech/badge/diverge)](https://pepy.tech/project/diverge4)
+[![Downloads](https://pepy.tech/badge/diverge/month)](https://pepy.tech/project/diverge4)
+[![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://pgx.zju.edu.cn/diverge)
+![GitHub last commit](https://img.shields.io/github/last-commit/cx994/diverge4?style=plastic)
+[![DOI](https://zenodo.org/badge/DOI/10.1093/molbev/mst069.svg)](https://doi.org/10.1093/molbev/mst069)
+
 
 DIVERGE v4 is a Python package designed for large-scale analysis of functional divergence across multi-gene families. It is a major upgrade of the widely used DIVERGE software, incorporating a novel Super-Cluster algorithm, a modular Python structure, and a user-friendly web server. This package allows for the identification of amino acid sites undergoing significant evolutionary shifts, helping to uncover functional divergence after gene duplication.
 
