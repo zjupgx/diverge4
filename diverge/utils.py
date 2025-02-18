@@ -244,7 +244,6 @@ def tree_construct(aln,method='nj',dist_calc='identity'):
         clade.name = None
     return tree
 
-
 def aln_to_tree(aln_file,method='nj'):
     try:
         aln = AlignIO.read(aln_file,'clustal')
