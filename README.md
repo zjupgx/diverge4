@@ -142,7 +142,7 @@ Common issues and solutions:
 3. **Internal Node Names**: Remove names from internal nodes in tree file
 4. **File Format**: Confirm MSA is in proper FASTA or CLUSTAL format
 
-For more detailed troubleshooting, please refer to our [documentation](./docs/Tutorial.md).
+
 
 ## Citation
 
