@@ -4,6 +4,30 @@
 
 DIVERGE v4 is a Python package designed for large-scale analysis of functional divergence across multi-gene families. It is a major upgrade of the widely used DIVERGE software, incorporating a novel Super-Cluster algorithm, a modular Python structure, and a user-friendly web server. This package allows for the identification of amino acid sites undergoing significant evolutionary shifts, helping to uncover functional divergence after gene duplication.
 
+DIVERGE analyzes two types of functional divergence:
+- **Type-I**: Significant differences in evolutionary rates at specific sites between gene clusters, indicating different functional constraints
+- **Type-II**: Subfamily-specific amino acid property conservation, where sites are conserved across subfamilies but with different amino acid types
+
+## Major Updates from DIVERGE v3
+
+1. **Novel Super-Cluster Algorithm**: A statistically robust method for analyzing large gene families that:
+   - Replaces numerous one-to-one comparisons with a single computation
+   - Divides clusters into Super-Cluster pairs based on conservation patterns
+   - Provides more accurate functional divergence detection for multi-gene families
+   - Reduces computational complexity from exponential to linear
+
+2. **Modular Python Architecture**: 
+   - Base Layer (C++ API): Core data structures and computationally intensive functions
+   - Middle Layer (Python Wrapper): PyBind11-based bridge between C++ and Python
+   - Top Layer (High-Level Python API): User-friendly interface for model building and analysis
+
+3. **Comprehensive Database**: 
+   - Analysis results of 4,540 human protein families
+   - Covers 10,133 human genes and 215,480 protein sequences
+   - Built using phylogenetic data from PANTHER database
+   - Multiple sequence alignments from 19 selected vertebrate species
+   - Expert-reviewed phylogenetic trees
+
 ![framework](./statics/framework.jpg)
 
 ## Features
@@ -39,6 +63,19 @@ python setup.py install
 
 ## Quick Start
 
+### Input Requirements
+
+1. **Multiple Sequence Alignment (MSA) File**:
+   - Supported formats: FASTA or CLUSTAL
+   - Only amino acid alignments are allowed
+   - Gaps (-) are allowed in the alignment
+   
+2. **Phylogenetic Tree File**:
+   - Must be in Newick format
+   - Branch lengths are optional but recommended
+   - Internal node names should be removed to prevent program crashes
+   - Tree depth must be at least 3 for proper analysis
+
 ### Example Usage
 
 Here's a simple example demonstrating how to use DIVERGE v4 for functional divergence analysis:
@@ -71,6 +108,21 @@ DIVERGE v4 provides various independent computing processes to create custom pip
 | **Effective Number of Sites** | Estimate the effective number of sites related to type-I or type-II functional divergence. **Requires two clusters** |
 | **Gene-Specific Type-I Analysis** | Site-specific posterior profile for predicting gene-specific type-I functional divergence-related sites. **Requires three clusters** |
 
+## Super-Cluster Algorithm
+
+The Super-Cluster algorithm is designed to efficiently analyze functional divergence in large gene families by:
+
+1. Partitioning m clusters into two groups (Super-Cluster pairs)
+2. Computing changes at amino acid sites for each Super-Cluster
+3. Performing DIVERGE Type-I analysis on Super-Cluster pairs
+4. Recording site-specific posterior probabilities for divergence profiling
+
+This approach provides several advantages:
+- Reduces computational complexity
+- Improves statistical robustness
+- Enables analysis of larger gene families
+- Provides more intuitive functional divergence profiles
+
 ## Web Server and Database
 
 The web server (https://pgx.zju.edu.cn/diverge) provides:
@@ -80,6 +132,17 @@ The web server (https://pgx.zju.edu.cn/diverge) provides:
 - **Search Functionality**: Query the database using UniProtKB ID, Ensembl ID, HGNC ID, or gene name
 - **Functional Annotations**: Access Gene Ontology terms, pathways, and protein class assignments for human proteins
 - **Visualization Tools**: Interactive visualization of results and amino acid sites
+
+## Troubleshooting
+
+Common issues and solutions:
+
+1. **Sequence Name Mismatch**: Ensure sequence names in MSA file exactly match those in tree file
+2. **Tree Depth Error**: Verify tree file has at least 3 levels of depth
+3. **Internal Node Names**: Remove names from internal nodes in tree file
+4. **File Format**: Confirm MSA is in proper FASTA or CLUSTAL format
+
+For more detailed troubleshooting, please refer to our [documentation](./docs/Tutorial.md).
 
 ## Citation
 
