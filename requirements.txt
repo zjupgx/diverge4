@@ -1,3 +1,4 @@
+scikit_bio
 biopython
 joblib
 matplotlib
@@ -6,7 +7,6 @@ pandas
 plotly
 pybind11
 pymsaviz
-scikit_bio
 scipy
 setuptools
 tqdm
