@@ -214,6 +214,14 @@ class Gu99(BaseAnalysis):
         """Initialize Gu99 analysis."""
         super().__init__(aln_file, *tree_files, cluster_name=cluster_name, trees=trees, calculator_module=_gu99cpp)
         self._summary_result = self.summary()
+        
+    def summary(self) -> pd.DataFrame:
+        """Generate a summary of the results."""
+        columns_names = get_colnames(self.calculator._r_names())
+        summary_results = pd.DataFrame(columns=columns_names)
+        for dict_item in self.calculator._summary():
+            summary_results.loc[dict_item["name"]] = dict_item["values"]
+        return summary_results
 
     def _calculate(self) -> None:
         """Create a new Gu99 Calculator and complete the calculation steps."""
@@ -465,7 +473,37 @@ class Rvs(BaseAnalysis):
             trees: List of Biopython.Phylo tree objects.
         """
         super().__init__(aln_file, *tree_files, cluster_name=cluster_name, trees=trees)
+    
+    def _calculate(self) -> None:
+        """Create a new rvs Calculator and complete the calculation steps."""
+        self.calculator = _rvscpp.create_calculator(self.input, self.cluster_name)
+        self.calculator.calculate()
+    
+    def summary(self) -> pd.DataFrame:
+        """Generate a summary of the results."""
+        columns_names = get_colnames(self.calculator._s_names())
+        summary_results = pd.DataFrame(columns=columns_names)
+        for dict_item in self.calculator._summary():
+            summary_results.loc[dict_item["name"]] = dict_item["values"]
+        summary_results.index.name = "Parameters"
+        return summary_results
 
+    def results(self) -> pd.DataFrame:
+        """
+        Generate detailed results.
+        
+        Parameters:
+        - Xk: Number of Changes
+        - Rk: Posterior Mean of Evolutionary Rate
+        """
+        columns_names = get_colnames(self.calculator._r_names())
+        results = pd.DataFrame(
+            self.calculator._results(),
+            columns=columns_names,
+            index=[i+1 for i in self.calculator._kept()]
+        )
+        return results
+    
     def _help(self) -> None:
         """Print help information for _rvscpp."""
         print(help(_rvscpp))
@@ -481,7 +519,7 @@ class TypeOneAnalysis(BaseAnalysis):
     S1=(F1, F0, F0) means type-one functional divergence occurred only in cluster 1,
     similarly: S2=(F0, F1, F0) and S3=(F0, F0, F1).
     The final pattern S4 is for the rest of four states, each of which has two or three
-    clusters that have experienced type-one functional divergence.
+    clusters that have experienced type-one fCursorSessionTokenunctional divergence.
     """
 
     def __init__(
@@ -506,6 +544,26 @@ class TypeOneAnalysis(BaseAnalysis):
         """Create a new TypeOneAnalysis Calculator and complete the calculation steps."""
         self.calculator = _typeOneAnalysiscpp.create_calculator(self.input, self.cluster_name)
         self.calculator.calculate()
+    
+    def summary(self) -> pd.DataFrame:
+        """Generate a summary of the results."""
+        columns_names = get_colnames(self.calculator._s_names())
+        summary_results = pd.DataFrame(columns=columns_names)
+        for dict_item in self.calculator._summary():
+            summary_results.loc[dict_item["name"]] = dict_item["values"]
+        summary_results.index.name = "Parameters"
+        return summary_results
+
+    def results(self) -> pd.DataFrame:
+        """Generate detailed results."""
+        columns_names = get_colnames(self.calculator._r_names())
+        results = pd.DataFrame(
+            self.calculator._results(),
+            columns=columns_names,
+            index=[i+1 for i in self.calculator._kept()]
+        )
+        results.index.name = "Position"
+        return results
 
     def _help(self) -> None:
         """Print help information for _typeOneAnalysiscpp."""

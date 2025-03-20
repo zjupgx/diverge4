@@ -6,4 +6,6 @@ dist/
 **/.vscode
 diverge/*.pyd
 */*.so
-.ipynb_checkpoints/
+/.ipynb_checkpoints/
+/diverge/_pycache_/
+/diverge/.ipynb_checkpoints/
