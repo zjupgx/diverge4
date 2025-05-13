@@ -35,7 +35,7 @@ DIVERGE analyzes two types of functional divergence:
    - Multiple sequence alignments from 19 selected vertebrate species
    - Expert-reviewed phylogenetic trees
 
-![framework](./statics/framework.jpg)
+![framework](./statics/framework_new.jpg)
 
 ## Features
 
