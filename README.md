@@ -35,7 +35,7 @@ DIVERGE analyzes two types of functional divergence:
    - Multiple sequence alignments from 19 selected vertebrate species
    - Expert-reviewed phylogenetic trees
 
-![framework](./statics/framework.jpg)
+![framework](./statics/framework_new.jpg)
 
 ## Features
 
@@ -96,7 +96,7 @@ result = gu99.results()
 print(result)
 ```
 
-For more detailed examples, check the [tutorials](./Tutorial.ipynb) and [casestudy](./CaseStudy/ERBB_analysis.ipynb).
+For more detailed examples, check the [tutorials](./Tutorial/Tutorial.ipynb) and [casestudy](./CaseStudy/ERBB_analysis.ipynb).
 
 ## Main Functional Modules
 

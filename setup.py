@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 from pybind11 import get_cmake_dir
 
-__version__ = "4.0.5"
+__version__ = "4.0.7"
 
 with open("requirements.txt", "r") as f:
     REQUIRED_PACKAGES = f.read().splitlines()
