@@ -96,7 +96,7 @@ result = gu99.results()
 print(result)
 ```
 
-For more detailed examples, check the [tutorials](./Tutorial.ipynb) and [casestudy](./CaseStudy/ERBB_analysis.ipynb).
+For more detailed examples, check the [tutorials](./Tutorial/Tutorial.ipynb) and [casestudy](./CaseStudy/ERBB_analysis.ipynb).
 
 ## Main Functional Modules
 
