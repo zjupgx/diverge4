@@ -17,7 +17,6 @@ from tqdm import tqdm
 from Bio.Phylo.TreeConstruction import DistanceCalculator
 from diverge import Gu99, Type2
 from diverge.binding import Gu99Batch
-from diverge.utils import printv, tqdm_joblib
 import math
 # BLOSUM62 background distribution for Jensen-Shannon divergence
 BLOSUM62_BACKGROUND = [0.074, 0.052, 0.045, 0.054, 0.025, 0.034, 0.054, 0.074,
@@ -86,15 +85,7 @@ def frequency_count(column: str, symbols: List[str], pseudocount: float = 0.0000
 
 def js_divergence(col1: str, col2: Optional[List[float]] = None) -> float:
     """Calculate Jensen-Shannon divergence for conservation scoring.
-    
-    Computes the Jensen-Shannon divergence between the amino acid composition
-    of an alignment column and either another distribution or the BLOSUM62
-    background distribution. The result is weighted by (1 - gap_percentage)
-    to account for alignment quality.
-    
-    The Jensen-Shannon divergence is a symmetric measure of similarity between
-    two probability distributions, ranging from 0 (identical) to 1 (completely different).
-    
+
     Args:
         col1: Alignment column as string.
         col2: Optional probability distribution to compare against.
@@ -105,9 +96,6 @@ def js_divergence(col1: str, col2: Optional[List[float]] = None) -> float:
         Returns -1.0 if distributions have different lengths.
         Higher values indicate lower conservation (more divergent from background).
         
-    Note:
-        Uses base-2 logarithm for divergence calculation. Gap characters
-        reduce the final score proportionally to their frequency.
     """
     fc1 = frequency_count(col1, AMINO_ACIDS_NO_GAP, 0.001)
     
@@ -140,19 +128,6 @@ def js_divergence(col1: str, col2: Optional[List[float]] = None) -> float:
 def normalize_to_01(score_list: List[Optional[float]]) -> List[Optional[float]]:
     """Map values to range [0,1], ignoring None values.
     
-    Performs min-max normalization on a list of scores, preserving None values.
-    Useful for standardizing different types of scores to a common scale.
-    
-    Args:
-        score_list: List of numerical scores, may contain None values.
-        
-    Returns:
-        List of normalized scores in [0,1] range. None values are preserved.
-        If all values are None or identical, handles edge cases appropriately.
-        
-    Note:
-        If all valid scores are identical, they are mapped to 1.0.
-        None values indicate positions that should be excluded from analysis.
     """
     new_scores = []
     valid_scores = [s for s in score_list if s is not None]
@@ -180,31 +155,7 @@ def conservation_window_score(sdp_scores: List[Optional[float]],
     """Apply conservation window heuristic to scores.
     
     Implements a sliding window approach to incorporate local sequence conservation
-    into functional divergence scores. This method combines the original SDP
-    (Site-specific Divergence Pattern) scores with conservation information
-    from neighboring alignment positions.
-    
-    The algorithm:
-    1. Calculates conservation scores for each alignment position using JS divergence
-    2. Computes windowed conservation averages around each position
-    3. Normalizes windowed conservation scores to [0,1]
-    4. Combines original and conservation scores using linear interpolation
-    
-    Args:
-        sdp_scores: Original site-specific divergence pattern scores.
-        alignment: List of aligned sequences as strings.
-        window_len: Half-window size for conservation calculation.
-                   Total window = 2*window_len + 1.
-        lambda_param: Weight for combining scores (default: 0.7).
-                     Final score = lambda*original + (1-lambda)*conservation.
-                     
-    Returns:
-        List of weighted scores combining original SDP and conservation information.
-        Positions with None in original scores remain None.
-        
-    Note:
-        Higher lambda_param values give more weight to original SDP scores.
-        Window boundary effects are handled by using available positions only.
+    into functional divergence scores.
     """
     win_scores = sdp_scores[:]
     cons_scores = []
@@ -275,20 +226,12 @@ def timeit(func):
 
 def pre_check_tree(trees: List[Tree]) -> bool:
     """Check if all trees have a depth of at least 3.
-    
-    Validates that each phylogenetic tree in the list has sufficient depth
-    for meaningful functional divergence analysis. Trees with insufficient
-    depth may not provide reliable evolutionary signal.
-    
+
     Args:
         trees: List of Biopython Tree objects to validate.
         
     Returns:
         True if all trees have depth >= 3, False if any tree fails the check.
-        
-    Note:
-        Tree depth is calculated as the maximum path length from root
-        to any terminal (leaf) node in the tree.
     """
     for tree in trees:
         tree_depth = max([len(tree.trace(tree.root, clade)) for clade in tree.get_terminals()])
@@ -298,25 +241,6 @@ def pre_check_tree(trees: List[Tree]) -> bool:
 
 def pre_check(aln_file: str,trees: List[Tree]) -> bool:
     """Check if all trees have a depth of at least 3 and match alignment.
-    
-    Performs comprehensive validation of trees and alignment compatibility:
-    1. Verifies that all tree terminal names exist in the alignment
-    2. Ensures all trees have sufficient depth (>= 3) for analysis
-    
-    Args:
-        aln_file: Path to the alignment file.
-        trees: List of Biopython Tree objects to validate.
-        
-    Returns:
-        True if all validation checks pass.
-        
-    Raises:
-        ValueError: If any tree terminal is not found in alignment,
-                   or if any tree has insufficient depth (<3).
-                   
-    Note:
-        This function reads the alignment file to extract sequence IDs
-        for comparison with tree terminal names.
     """
     aln = aln_read(aln_file)
     seq_ids = [record.id for record in aln]
@@ -331,22 +255,6 @@ def pre_check(aln_file: str,trees: List[Tree]) -> bool:
 
 def aln_read(aln_file: str) -> AlignIO.MultipleSeqAlignment:
     """Read an alignment file in clustal or fasta format.
-    
-    Attempts to read an alignment file, trying clustal format first,
-    then falling back to fasta format if that fails.
-    
-    Args:
-        aln_file: Path to the alignment file.
-        
-    Returns:
-        Parsed multiple sequence alignment object.
-        
-    Raises:
-        Exception: If the file cannot be parsed as either clustal or fasta format.
-        
-    Note:
-        The function automatically detects the format by attempting
-        to parse with each format sequentially.
     """
     try:
         aln = AlignIO.read(aln_file, 'clustal')
@@ -359,19 +267,6 @@ def aln_read(aln_file: str) -> AlignIO.MultipleSeqAlignment:
 
 def sk_aln_read(aln_file: str) -> TabularMSA:
     """Read an alignment file using scikit-bio.
-    
-    Reads a FASTA alignment file and converts it to a scikit-bio TabularMSA
-    object. Attempts to reassign sequence indices using sequence IDs.
-    
-    Args:
-        aln_file: Path to the alignment file (must be FASTA format).
-        
-    Returns:
-        TabularMSA object containing protein sequences.
-        
-    Note:
-        If sequence ID reassignment fails (due to missing or duplicate IDs),
-        the function continues with default numeric indices.
     """
     from skbio import io
     # Read the alignment and convert the generator to TabularMSA
@@ -386,25 +281,6 @@ def sk_aln_read(aln_file: str) -> TabularMSA:
 
 def skbio_to_biopython_tree(dm,skbio_tree: Any) -> Tree:
     """Convert a scikit-bio tree to a Biopython tree.
-    
-    Recursively converts a scikit-bio tree structure to the equivalent
-    Biopython Tree object, preserving branch lengths and terminal names.
-    Handles name formatting issues (spaces converted to underscores).
-    
-    Args:
-        dm: Distance matrix containing valid sequence IDs for name validation.
-        skbio_tree: A scikit-bio tree object to convert.
-        
-    Returns:
-        Converted Biopython Tree object with equivalent structure.
-        
-    Raises:
-        ValueError: If a terminal name cannot be found in the distance matrix IDs,
-                   even after attempting space-to-underscore conversion.
-                   
-    Note:
-        Internal nodes in the converted tree will have no names (None).
-        Only terminal (leaf) nodes retain their original names.
     """
     def convert_node(skbio_node: Any) -> Clade:
         if skbio_node.is_tip():
@@ -427,10 +303,7 @@ def skbio_to_biopython_tree(dm,skbio_tree: Any) -> Tree:
 
 def tree_construct(aln: TabularMSA) -> Tuple[DistanceMatrix, Tree]:
     """Construct a phylogenetic tree from an alignment.
-    
-    Uses Hamming distance to compute pairwise distances between sequences
-    and applies neighbor-joining algorithm to construct the tree.
-    
+
     Args:
         aln: Multiple sequence alignment as TabularMSA object.
         
@@ -438,10 +311,6 @@ def tree_construct(aln: TabularMSA) -> Tuple[DistanceMatrix, Tree]:
         Tuple containing:
         - DistanceMatrix: Pairwise distances between sequences
         - Tree: Phylogenetic tree constructed using neighbor-joining
-        
-    Note:
-        The function is decorated with @timeit for performance monitoring.
-        Hamming distance counts the number of differing positions between sequences.
     """
     dm = DistanceMatrix.from_iterable(aln, metric=hamming, keys=aln.index)
     tree = nj(dm)
@@ -450,20 +319,11 @@ def tree_construct(aln: TabularMSA) -> Tuple[DistanceMatrix, Tree]:
 
 def re_clean_tree(tree: Tree) -> Tree:
     """Remove names from non-terminal nodes of a tree.
-    
-    Cleans up internal node names in a phylogenetic tree, leaving only
-    terminal (leaf) nodes with their original names. This is often necessary
-    after tree construction to ensure proper formatting.
-    
     Args:
         tree: Biopython Tree object to clean.
         
     Returns:
         The same tree object with internal node names set to None.
-        
-    Note:
-        Modifies the tree in-place by setting the name attribute of
-        all non-terminal clades to None.
     """
     for clade in tree.get_nonterminals():
         clade.name = None
@@ -471,10 +331,6 @@ def re_clean_tree(tree: Tree) -> Tree:
 
 def get_cluster_bio(aln, *tree_files: str, trees: List[Tree] = []) -> Tuple[List[int], int, dict]:
     """Get cluster information from alignment and trees using Biopython alignment.
-    
-    Assigns cluster labels to sequences based on their presence in the provided trees.
-    Sequences not present in any tree are assigned to cluster 0.
-    
     Args:
         aln: Biopython multiple sequence alignment object.
         *tree_files: Variable number of paths to tree files in Newick format.
@@ -485,10 +341,6 @@ def get_cluster_bio(aln, *tree_files: str, trees: List[Tree] = []) -> Tuple[List
         - List[int]: Cluster assignments for each sequence (0 = no cluster)
         - int: Total number of clusters found
         - dict: Mapping from cluster number to tree identifier
-        
-    Note:
-        Uses Biopython alignment objects with .id attribute for sequence names.
-        Tree files are read in Newick format and identified by their base filename.
     """
     names = [record.id for record in aln]
     tree_cluster = [0] * len(names)
@@ -566,11 +418,6 @@ def _get_indices_from_boolean_array(bool_tuple: Tuple[bool, ...]) -> Tuple[int, 
 
 def sub_dm(dm: DistanceMatrix, c_list: np.ndarray) -> DistanceMatrix:
     """Optimized distance matrix subsetting with caching.
-    
-    Extracts a subset of the distance matrix based on boolean or integer indexing.
-    Implements caching for boolean arrays to improve performance when the same
-    subsetting patterns are used repeatedly.
-    
     Args:
         dm: Original distance matrix to subset.
         c_list: Boolean array (True for positions to include) or
@@ -578,10 +425,6 @@ def sub_dm(dm: DistanceMatrix, c_list: np.ndarray) -> DistanceMatrix:
                
     Returns:
         New DistanceMatrix containing only the selected rows and columns.
-        
-    Note:
-        Boolean indexing uses LRU caching to speed up repeated operations.
-        The function preserves sequence IDs in the subset matrix.
     """
     if c_list.dtype == bool:
         # Use caching for frequently used boolean patterns
@@ -598,10 +441,6 @@ def sub_dm(dm: DistanceMatrix, c_list: np.ndarray) -> DistanceMatrix:
 
 def sep_cluster(tree_cluster: List[int], cluster_num: int, mode: str = "ALL") -> Tuple[List[np.ndarray], List[Tuple[List[int], List[int]]]]:
     """Separate clusters into groups for comparative analysis.
-    
-    Creates all possible pairwise groupings of clusters for functional divergence analysis.
-    Each grouping divides clusters into two sets for comparison.
-    
     Args:
         tree_cluster: List of cluster assignments for each sequence (0 = unassigned).
         cluster_num: Total number of clusters to consider.
@@ -616,10 +455,6 @@ def sep_cluster(tree_cluster: List[int], cluster_num: int, mode: str = "ALL") ->
         
     Raises:
         ValueError: If mode is not "ALL" or "Simple".
-        
-    Note:
-        The "Simple" mode is useful for one-vs-rest comparisons,
-        while "ALL" mode generates all possible pairwise comparisons.
     """
     if mode not in ["ALL", "Simple"]:
         raise ValueError(f"Mode must be 'ALL' or 'Simple', got '{mode}'")
@@ -642,10 +477,6 @@ def sep_cluster(tree_cluster: List[int], cluster_num: int, mode: str = "ALL") ->
 
 def get_group_list(group_num: int) -> List[Tuple[List[int], List[int]]]:
     """Generate all possible group combinations for cluster comparison.
-    
-    Creates all possible ways to divide clusters into two non-empty groups,
-    ensuring each combination appears only once by ordering groups by size.
-    
     Args:
         group_num: Total number of clusters to divide.
         
@@ -657,10 +488,6 @@ def get_group_list(group_num: int) -> List[Tuple[List[int], List[int]]]:
         >>> get_group_list(3)
         [([1], [2, 3]), ([2], [1, 3]), ([3], [1, 2])]
         # For 3 clusters: three ways to divide into groups
-        
-    Note:
-        Uses frozenset operations for efficient set arithmetic.
-        Clusters are numbered starting from 1, not 0.
     """
     nums = frozenset(range(1, group_num + 1))
     group_list = []
@@ -727,10 +554,6 @@ def tree_reconstruct(dm: DistanceMatrix, cluster: np.ndarray) -> Tuple[Tree, Tre
 @timeit
 def diverge_cal(aln_file: str, super_cluster: List[Tree], sp_type: int) -> Tuple[Optional[List[Any]], Optional[List[str]], Optional[Any]]:
     """Process trees for functional divergence analysis.
-    
-    Performs functional divergence analysis on a set of phylogenetic trees
-    using either Gu99 (Type I) or Type2 analysis methods.
-    
     Args:
         aln_file: Path to the multiple sequence alignment file.
         super_cluster: List of phylogenetic Tree objects for analysis.
@@ -743,10 +566,6 @@ def diverge_cal(aln_file: str, super_cluster: List[Tree], sp_type: int) -> Tuple
         - Optional[List[Any]]: Results matrix as list of lists, None if analysis failed
         - Optional[List[str]]: Position indices as strings, None if analysis failed
         - Optional[Any]: Summary DataFrame with analysis parameters, None if failed
-        
-    Note:
-        Analysis will fail if trees don't pass pre-validation checks
-        (insufficient depth or mismatched sequence names).
     """
     if pre_check(aln_file, super_cluster):
         if sp_type == 1:
@@ -765,10 +584,6 @@ def diverge_cal(aln_file: str, super_cluster: List[Tree], sp_type: int) -> Tuple
 def diverge_cal_batch(aln_file: str, super_clusters: List[List[Tree]], sp_type: int, max_threads: Optional[int] = None) -> List[Tuple[Optional[List[Any]], Optional[List[str]], Optional[Any]]]:
     """
     Process multiple tree clusters for functional divergence analysis using parallel batch processing.
-    
-    This function provides significant performance improvements over sequential processing,
-    especially for large numbers of clusters on multi-core systems.
-
     Args:
         aln_file (str): Path to the alignment file.
         super_clusters (List[List[Tree]]): List of tree clusters to process.
@@ -851,15 +666,10 @@ def diverge_cal_batch(aln_file: str, super_clusters: List[List[Tree]], sp_type: 
     return final_results
 
 # Helper to enable process-parallel NJ + cleanup
-# using raw NumPy arrays to leverage joblib memmapping
 from typing import cast
 
 def _reconstruct_and_clean_from_array(dm_data: np.ndarray, dm_ids: List[str], cluster: np.ndarray) -> List[Tree]:
     """Reconstruct phylogenetic trees from distance matrix data and cluster assignments.
-    
-    Helper function that builds two phylogenetic trees from distance matrix subsets
-    corresponding to cluster assignments. Handles edge cases where clusters might be empty.
-    
     Args:
         dm_data: 2D numpy array containing pairwise distances.
         dm_ids: List of sequence identifiers corresponding to matrix rows/columns.
@@ -870,11 +680,6 @@ def _reconstruct_and_clean_from_array(dm_data: np.ndarray, dm_ids: List[str], cl
         - First tree: sequences assigned to cluster 1
         - Second tree: sequences assigned to cluster 2
         Empty trees are returned if any cluster is empty.
-        
-    Note:
-        Uses neighbor-joining algorithm for tree construction.
-        Trees are cleaned to remove internal node names.
-        Designed for parallel processing with joblib.
     """
     # Boolean masks for two clusters
     cluster1_mask = (cluster == 1)
@@ -1134,11 +939,6 @@ class SuperCluster:
             
         Raises:
             ValueError: If no tree files are available for benchmarking.
-            
-        Note:
-            Only benchmarks Gu99 analyses (sp_type=1) as parallel processing
-            is currently only implemented for this analysis type.
-            Prints detailed timing results and speedup information.
         """
         if not hasattr(self, 'tree_files') or not self.tree_files:
             raise ValueError("Cannot benchmark: no tree files available")
@@ -1207,12 +1007,12 @@ class SuperCluster:
         
 # Main execution
 if __name__ == "__main__":
-    aln_file = "E:/verysync/diverge_pybind/web/statics/example_data/ERBB_family.fas"
+    aln_file = "../test/ERBB_family.fas"
     tree_files = [
-        "E:/verysync/diverge_pybind/web/statics/example_data/EGFR.tree",
-        "E:/verysync/diverge_pybind/web/statics/example_data/ERBB2.tree",
-        "E:/verysync/diverge_pybind/web/statics/example_data/ERBB3.tree",
-        "E:/verysync/diverge_pybind/web/statics/example_data/ERBB4.tree"
+        "../test/EGFR.tree",
+        "../test/ERBB2.tree",
+        "../test/ERBB3.tree",
+        "../test/ERBB4.tree"
     ]
     # Example without conservation weighting
     super_cluster = SuperCluster(aln_file, *tree_files)

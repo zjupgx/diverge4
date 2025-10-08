@@ -26,18 +26,6 @@ def read_tree(tree_file: str) -> Tree:
     # If all formats fail
     raise ValueError(f"Tree file '{tree_file}' could not be parsed: {last_error}")
 
-def get_colnames(r_names: List[str]) -> List[str]:
-    """Get column names from r_names.
-    
-    Creates a copy of the input list to avoid modifying the original.
-    
-    Args:
-        r_names: List of column names to copy.
-        
-    Returns:
-        A new list containing the same column names.
-    """
-    return r_names.copy()
 
 def load_tree_file(tree_file: str, check: bool = True) -> str:
     """Load a tree file and optionally check its validity.
@@ -238,7 +226,7 @@ class BaseAnalysis:
             return None
             
         name_method = '_r_names' if hasattr(self.calculator, '_r_names') else '_s_names'
-        columns_names = get_colnames(getattr(self.calculator, name_method)())
+        columns_names = getattr(self.calculator, name_method)().copy()
         
         summary_results = pd.DataFrame(columns=columns_names)
         for dict_item in self.calculator._summary():
@@ -262,8 +250,8 @@ class BaseAnalysis:
             
         if not hasattr(self.calculator, '_results'):
             return None
-            
-        columns_names = get_colnames(self.calculator._r_names())
+
+        columns_names = self.calculator._r_names().copy()
         
         if hasattr(self.calculator, '_kept'):
             index = [i for i in self.calculator._kept()]
@@ -310,22 +298,6 @@ class BaseAnalysis:
         """Factory method to create analysis from tree files."""
         return cls(aln_file, *tree_files, **kwargs)
 
-    def _set_index_name(self, df: pd.DataFrame, name: str) -> pd.DataFrame:
-        """Set index name for dataframe.
-        
-        Helper method to set the index name of a DataFrame if it doesn't already have one.
-        
-        Args:
-            df: DataFrame to modify (can be None).
-            name: Name to set for the index.
-            
-        Returns:
-            The same DataFrame with index name set, or None if input was None.
-        """
-        if df is not None and df.index.name is None:
-            df.index.name = name
-        return df
-
 class Gu99(BaseAnalysis):
     """Class for Gu99 analysis."""
     
@@ -353,14 +325,20 @@ class Gu99(BaseAnalysis):
         return summary_results
     @property
     def results(self) -> pd.DataFrame:
+        """Get analysis results, optionally filtered based on filter parameter."""
         results = super().results
         if self.filter:
-            from .filter import filter_results
-            aln = AlignIO.read(self.aln_file,"fasta")
-            trees = [Phylo.read(tree_file,"newick") for tree_file in self.tree_files]
-            results,_ = filter_results(results.T,aln,trees)
-            results = results.T
+            results = self._apply_filter(results)
         return results
+
+    def get_filtered_results(self) -> pd.DataFrame:
+        """Get filtered results regardless of filter parameter setting.
+
+        Returns:
+            Filtered results DataFrame.
+        """
+        return self._apply_filter(super().results)
+
     def _calculate(self) -> None:
         """Create a new Gu99 Calculator and complete the calculation steps."""
         self.calculator = self.calculator_module.create_calculator(self.input, self.cluster_name)
@@ -379,10 +357,6 @@ class Gu99(BaseAnalysis):
         Returns:
             DataFrame with functional distances for each cluster, or None if
             insufficient clusters (<=2) are available.
-            
-        Note:
-            This calculation is only meaningful when there are at least 3 clusters
-            in the analysis.
         """
         if len(self.input) <= 3:
             return None
@@ -808,16 +782,12 @@ class Gu2001(BaseAnalysis):
             cluster_name: Names of clusters.
             trees: List of Biopython.Phylo tree objects.
         """
-        super().__init__(aln_file, *tree_files, cluster_name=cluster_name, trees=trees)
+        super().__init__(aln_file, *tree_files, cluster_name=cluster_name, trees=trees, calculator_module=_gu2001cpp)
 
     def _calculate(self) -> None:
         """Create a new Gu2001 Calculator and complete the calculation steps."""
         self.calculator = _gu2001cpp.create_calculator(self.input, self.cluster_name)
         self.calculator.calculate()
-
-    def _help(self) -> None:
-        """Print help information for _gu2001cpp."""
-        print(help(_gu2001cpp))
 
 class Type2(BaseAnalysis):
     def __init__(
@@ -837,16 +807,12 @@ class Type2(BaseAnalysis):
             trees: List of Biopython.Phylo tree objects.
         """
         if check_tree_file(*tree_files):
-            super().__init__(aln_file, *tree_files, cluster_name=cluster_name, trees=trees)
+            super().__init__(aln_file, *tree_files, cluster_name=cluster_name, trees=trees, calculator_module=_type2cpp)
 
     def _calculate(self) -> None:
         """Create a new Type2 Calculator and complete the calculation steps."""
         self.calculator = _type2cpp.create_calculator(self.input, self.cluster_name)
         self.calculator.calculate()
-
-    def _help(self) -> None:
-        """Print help information for _type2cpp."""
-        print(help(_type2cpp))
 
 class Asym(BaseAnalysis):
     """Class for Asym analysis."""
@@ -866,10 +832,11 @@ class Asym(BaseAnalysis):
         """Create a new Asym Calculator and complete the calculation steps."""
         self.calculator = _asymcpp.create_calculator(self.input, self.cluster_name)
         self.calculator.calculate()
-    
+
+    @property
     def results(self) -> pd.DataFrame:
         """Generate detailed results."""
-        columns_names = get_colnames(self.calculator._r_names())
+        columns_names = self.calculator._r_names().copy()
         results = pd.DataFrame(
             self.calculator._results(),
             columns=columns_names,
@@ -904,41 +871,35 @@ class Effective(BaseAnalysis):
 
     def type1_results(self) -> pd.DataFrame:
         """Generate Type 1 results.
-        
+
         Retrieves and formats Type 1 functional divergence results from the calculator.
         Type 1 results typically represent sites under positive selection or
         functional constraints in specific lineages.
-        
+
         Returns:
             DataFrame containing Type 1 analysis results with proper column names
             and numbered index.
         """
-        columns_names = get_colnames(self.calculator._r_names())
+        columns_names = self.calculator._r_names().copy()
         results = pd.DataFrame(self.calculator._results1(), columns=columns_names)
         results.index.name = "Number"
         return results
 
     def type2_results(self) -> pd.DataFrame:
         """Generate Type 2 results.
-        
+
         Retrieves and formats Type 2 functional divergence results from the calculator.
         Type 2 results typically represent sites with altered evolutionary rates
         between different lineages or functional classes.
-        
+
         Returns:
             DataFrame containing Type 2 analysis results with proper column names
             and numbered index.
         """
-        columns_names = get_colnames(self.calculator._r_names())
+        columns_names = self.calculator._r_names().copy()
         results = pd.DataFrame(self.calculator._results2(), columns=columns_names)
         results.index.name = "Number"
         return results
-
-    def _help(self) -> None:
-        """Print help information for _effectivecpp."""
-        print(help(_effectivecpp))
-
-# Continue with other classes...
 
 class Fdr(BaseAnalysis):
     """Class for Fdr analysis."""
@@ -961,19 +922,15 @@ class Fdr(BaseAnalysis):
 
     def type1_results(self) -> pd.DataFrame:
         """Generate Type 1 results."""
-        columns_names = get_colnames(self.calculator._r_names())
+        columns_names = self.calculator._r_names().copy()
         results = pd.DataFrame(self.calculator._results1(), columns=columns_names)
         return results.set_index(results.columns[0], drop=True)
 
     def type2_results(self) -> pd.DataFrame:
         """Generate Type 2 results."""
-        columns_names = get_colnames(self.calculator._r_names())
+        columns_names = self.calculator._r_names().copy()
         results = pd.DataFrame(self.calculator._results2(), columns=columns_names)
         return results.set_index(results.columns[0], drop=True)
-
-    def _help(self) -> None:
-        """Print help information for _fdrcpp."""
-        print(help(_fdrcpp))
 
 class Rvs(BaseAnalysis):
     def __init__(
@@ -992,8 +949,8 @@ class Rvs(BaseAnalysis):
             cluster_name: Names of clusters.
             trees: List of Biopython.Phylo tree objects.
         """
-        super().__init__(aln_file, *tree_files, cluster_name=cluster_name, trees=trees)
-    
+        super().__init__(aln_file, *tree_files, cluster_name=cluster_name, trees=trees, calculator_module=_rvscpp)
+
     def _calculate(self) -> None:
         """Create a new rvs Calculator and complete the calculation steps."""
         self.calculator = _rvscpp.create_calculator(self.input, self.cluster_name)
@@ -1011,22 +968,18 @@ class Rvs(BaseAnalysis):
     def results(self) -> pd.DataFrame:
         """
         Generate detailed results.
-        
+
         Parameters:
         - Xk: Number of Changes
         - Rk: Posterior Mean of Evolutionary Rate
         """
-        columns_names = get_colnames(self.calculator._r_names())
+        columns_names = self.calculator._r_names().copy()
         results = pd.DataFrame(
             self.calculator._results(),
             columns=columns_names,
             index=[i for i in self.calculator._kept()]
         )
         return results
-    
-    def _help(self) -> None:
-        """Print help information for _rvscpp."""
-        print(help(_rvscpp))
 
 class TypeOneAnalysis(BaseAnalysis):
     """
@@ -1058,7 +1011,7 @@ class TypeOneAnalysis(BaseAnalysis):
             cluster_name: Names of clusters.
             trees: List of Biopython.Phylo tree objects.
         """
-        super().__init__(aln_file, *tree_files, cluster_name=cluster_name, trees=trees)
+        super().__init__(aln_file, *tree_files, cluster_name=cluster_name, trees=trees, calculator_module=_typeOneAnalysiscpp)
 
     def _calculate(self) -> None:
         """Create a new TypeOneAnalysis Calculator and complete the calculation steps."""
@@ -1076,7 +1029,7 @@ class TypeOneAnalysis(BaseAnalysis):
 
     def results(self) -> pd.DataFrame:
         """Generate detailed results."""
-        columns_names = get_colnames(self.calculator._r_names())
+        columns_names = self.calculator._r_names().copy()
         results = pd.DataFrame(
             self.calculator._results(),
             columns=columns_names,
@@ -1085,8 +1038,3 @@ class TypeOneAnalysis(BaseAnalysis):
         results.index.name = "Position"
         return results
 
-    def _help(self) -> None:
-        """Print help information for _typeOneAnalysiscpp."""
-        print(help(_typeOneAnalysiscpp))
-
-# End of file

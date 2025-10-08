@@ -255,16 +255,6 @@ def printv(*text: Any, show_time: bool = True, verbose: bool = True) -> None:
 
 @contextlib.contextmanager
 def tqdm_joblib(*args: Any, **kwargs: Any) -> Generator[tqdm, None, None]:
-    """
-    Context manager to patch joblib to report into tqdm progress bar.
-
-    Args:
-        *args (Any): Arguments for tqdm
-        **kwargs (Any): Keyword arguments for tqdm
-
-    Yields:
-        Generator[tqdm, None, None]: A tqdm progress bar object
-    """
     tqdm_object = tqdm(*args, **kwargs)
     class TqdmBatchCompletionCallback(joblib.parallel.BatchCompletionCallBack):
         def __init__(self, *args: Any, **kwargs: Any) -> None:
