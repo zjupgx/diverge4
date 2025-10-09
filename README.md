@@ -5,7 +5,7 @@
 [![Downloads](https://pepy.tech/badge/diverge)](https://pepy.tech/project/diverge)
 [![Downloads](https://pepy.tech/badge/diverge/month)](https://pepy.tech/project/diverge)
 [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://pgx.zju.edu.cn/diverge)
-![GitHub last commit](https://img.shields.io/github/last-commit/cx994/diverge4?style=plastic)
+![GitHub last commit](https://img.shields.io/github/last-commit/zjupgx/diverge4?style=plastic)
 [![DOI](https://zenodo.org/badge/DOI/10.1093/molbev/mst069.svg)](https://doi.org/10.1093/molbev/mst069)
 
 
