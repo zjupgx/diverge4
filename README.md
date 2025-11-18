@@ -49,7 +49,7 @@ DIVERGE analyzes two types of functional divergence:
 To install the DIVERGE v4 Python package, use pip:
 
 ```bash
-pip install diverge4
+pip install diverge
 ```
 
 If you prefer to compile the package from source using setup.py, you will need to install the pybind11 library, which provides the C++ bindings for Python used in this package. You can install it via pip:
