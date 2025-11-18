@@ -204,7 +204,7 @@ Common issues and solutions:
 If you use DIVERGE in your research, please cite:
 
 ```
-
+Chen Y, Xu X, Pan Y, Wang S, Zhao W, Zhou B, Zhou J, Zheng Y, Zhou Z, Gu X. DIVERGE v4: A Platform for Large-Scale Analysis of Functional Divergence Across Multi-Gene Families. Mol Biol Evol. 2025, 42(11):msaf277. doi: 10.1093/molbev/msaf277.
 ```
 
 
