@@ -134,7 +134,7 @@ Tests for asymmetric evolutionary patterns using outgroup information.
 from diverge import Asym
 
 asym = Asym("alignment.aln", "ingroup1.tree", "ingroup2.tree", "outgroup.tree")
-results = asym.results()  # Results by outgroup cluster
+results = asym.results  # Results by outgroup cluster
 ```
 
 ### 5. Effective Sites Calculation
@@ -174,7 +174,7 @@ from diverge import Rvs
 
 rvs = Rvs("alignment.aln", "cluster1.tree", "cluster2.tree")
 print("Rate parameters:", rvs.summary)
-rates = rvs.results()  # Site-specific rate estimates
+rates = rvs.results  # Site-specific rate estimates
 ```
 
 ### 8. TypeOneAnalysis (Multi-cluster Extension)
@@ -187,7 +187,7 @@ from diverge import TypeOneAnalysis
 analysis = TypeOneAnalysis("alignment.aln", "cluster1.tree", 
                           "cluster2.tree", "cluster3.tree")
 print("State probabilities:", analysis.summary)
-patterns = analysis.results()  # Site-specific pattern probabilities
+patterns = analysis.results  # Site-specific pattern probabilities
 ```
 
 ## SuperCluster Algorithm
