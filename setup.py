@@ -10,6 +10,9 @@ __version__ = "4.1.0"
 with open("requirements.txt", "r") as f:
     REQUIRED_PACKAGES = f.read().splitlines()
 
+SRC_DIR = 'src' if sys.platform == 'win32' else 'src_linux'
+
+
 def get_extension_modules():
     """Define and return the list of extension modules."""
     common_compile_args = ['-w']
@@ -18,7 +21,7 @@ def get_extension_modules():
     extension_modules = [
         Pybind11Extension(
             f"diverge._{module}cpp",
-            sorted(glob(f'src/{module}/*.c*')),
+            sorted(glob(f'{SRC_DIR}/{module}/*.c*')),
             define_macros=common_macros,
             language='c++',
             extra_compile_args=common_compile_args,

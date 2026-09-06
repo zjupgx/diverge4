@@ -3,31 +3,19 @@
 #include <string>
 #include <vector>
 
+#include <cmath>
 #include <math.h>
 #include <ctype.h>
 
 #include <stdio.h>
 
-#ifndef WIN32
-#include <values.h>
-#else
 #include <float.h>
-#endif
 
 #include "cluster.h"
 #include "sequence.h"
 
 using namespace std;
 
-#ifndef WIN32
-#  define isfinite(x) \
-     (sizeof (x) == sizeof (float)                                            \
-      ? __finitef (x)                                                         \
-      : sizeof (x) == sizeof (double)                                         \
-      ? __finite (x) : __finitel (x))
-#else
-#define isfinite(x) _finite(x)
-#endif
 
 #if 0
 static void
