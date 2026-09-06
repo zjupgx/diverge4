@@ -27,6 +27,10 @@ def read_tree(tree_file: str) -> Tree:
     raise ValueError(f"Tree file '{tree_file}' could not be parsed: {last_error}")
 
 
+def get_colnames(names):
+    return list(names)
+
+
 def load_tree_file(tree_file: str, check: bool = True) -> str:
     """Load a tree file and optionally check its validity.
     
