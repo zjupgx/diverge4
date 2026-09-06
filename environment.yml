@@ -8,7 +8,5 @@ dependencies:
   - pybind11
   - scikit-bio
   - biopython
-  - plotly
-  - pymsaviz
   - tqdm
   - matplotlib
