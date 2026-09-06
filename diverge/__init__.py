@@ -11,6 +11,7 @@ __author__ = 'DIVERGE Team'
 from .binding import (
     # Core analysis classes
     Gu99,
+    Gu99Batch,
     Gu2001,
     Type2,
     Asym,
