@@ -38,7 +38,7 @@ def load_tree_file(tree_file: str, check: bool = True) -> str:
     
     Args:
         tree_file: Path to the tree file to load.
-        check: Whether to validate the tree structure (depth >= 3).
+        check: Whether to validate the tree structure (depth > 3).
         
     Returns:
         The tree in Newick format string, with trailing newlines removed.
@@ -84,7 +84,7 @@ def check_tree(tree: Tree) -> bool:
         ValueError: If the tree depth is less than or equal to 3.
     """
     if not check_tree_depth(tree):
-        raise ValueError(f'Tree depth is less than 3, please check your tree: {tree}')
+        raise ValueError(f'Tree depth must be greater than 3, please check your tree: {tree}')
     return True
 
 def check_tree_file(*tree_files: str) -> bool:
