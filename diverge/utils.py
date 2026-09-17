@@ -171,6 +171,8 @@ class CalPipe:
         # Map results from analyzer to instance attributes
         for source_attr, target_attr in config['result_attrs']:
             value = getattr(analyzer, source_attr)
+            if callable(value):
+                value = value()
             setattr(self, target_attr, value)
             self._results[target_attr] = value
 

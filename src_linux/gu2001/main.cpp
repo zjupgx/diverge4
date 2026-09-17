@@ -25,28 +25,17 @@ using namespace std;
 
 bool
 preprocess(vector<string>& names,vector<Tree> &trees,vector<sequence_t> &sequences) {
-	try {
-		if (trees.size()<2) {
-			throw std::invalid_argument("Need to create at least two clusters first.");
-		}
-		if (sequences.empty()) {
-			throw std::invalid_argument("Need to load aligned sequences first.");
-		}
-		
-		bool trees_branch_zero = false;
-		for(int i = 0; i < trees.size(); i++) {
-			if(!trees[i].has_branch_length()) {
-				trees_branch_zero = true;
-				break;
-			}
-		}
-		
-		if (trees_branch_zero) {
+	if (trees.size() < 2) {
+		throw std::invalid_argument("Need to create at least two clusters first.");
+	}
+	if (sequences.empty()) {
+		throw std::invalid_argument("Need to load aligned sequences first.");
+	}
+
+	for (size_t i = 0; i < trees.size(); i++) {
+		if (!trees[i].has_branch_length()) {
 			throw std::runtime_error("Gu2001 method failed. The input trees do not contain branch length!");
 		}
-	}
-	catch(const std::exception& e) {
-		cout << e.what() << endl;
 	}
 
 	names.resize(trees.size());
@@ -77,68 +66,63 @@ process(const vector<Tree>& trees,
 	vector<summary_t>& summary2,
 	vector<result_t>& results2) {
 	vector<vector<double> > summary, rets;
-	
-	try {
-		if (!gu2001_compute(trees, sequences, summary, rets)) {
-			throw std::runtime_error("Error in gu2001_compute module!");
-		}
-		
-		if (summary.empty()) {
-			throw std::runtime_error("Summary is empty.");
-		}
-		else {
-			const char *names[4] = {"AlphaML", "ThetaML", "SE Theta", "LRT Theta"};
 
-			size_t nsum = summary[0].size();
-			assert(nsum == 4);
+	if (!gu2001_compute(trees, sequences, summary, rets)) {
+		throw std::runtime_error("Error in gu2001_compute module!");
+	}
 
-			summary_t s;
-			s.values.resize(summary.size());
+	if (summary.empty()) {
+		throw std::runtime_error("Summary is empty.");
+	}
+	else {
+		const char *names[4] = {"AlphaML", "ThetaML", "SE Theta", "LRT Theta"};
 
-			for (size_t i = 0; i < nsum; i++)
-			{
-				s.name = names[i];
-				for (size_t j = 0; j < summary.size(); j++)
-				{
-					s.values[j] = summary[j][i];
-				}
-				summary2.push_back(s);
-			}
-		}
+		size_t nsum = summary[0].size();
+		assert(nsum == 4);
 
-		if (rets.empty()) {
-			throw std::runtime_error("Result is empty.");
-		}
-		else
+		summary_t s;
+		s.values.resize(summary.size());
+
+		for (size_t i = 0; i < nsum; i++)
 		{
-			size_t i, j, ngroups = names.size();
-			for (i = 0; i < ngroups; i++)
+			s.name = names[i];
+			for (size_t j = 0; j < summary.size(); j++)
 			{
-				for (j = i + 1; j < ngroups; j++)
-				{
-					string str = names[i] + '/' + names[j];
-					names2.push_back(str);
-				}
+				s.values[j] = summary[j][i];
 			}
-
-			size_t nrets = rets[0].size();
-
-			result_t r;
-			r.values.resize(rets.size());
-
-			for (i = 0; i < nrets; i++)
-			{
-				r.pos = i;
-				for (j = 0; j < rets.size(); j++)
-				{
-					r.values[j] = rets[j][i];
-				}
-				results2.push_back(r);
-			}
+			summary2.push_back(s);
 		}
 	}
-	catch (const std::exception& e) {
-		cout << e.what() << endl;
+
+	if (rets.empty()) {
+		throw std::runtime_error("Result is empty.");
+	}
+	else
+	{
+		size_t i, j, ngroups = names.size();
+		for (i = 0; i < ngroups; i++)
+		{
+			for (j = i + 1; j < ngroups; j++)
+			{
+				string str = names[i] + '/' + names[j];
+				names2.push_back(str);
+			}
+		}
+
+		size_t nrets = rets[0].size();
+
+		result_t r;
+		r.values.resize(rets.size());
+
+		for (i = 0; i < nrets; i++)
+		{
+			r.pos = i;
+			for (j = 0; j < rets.size(); j++)
+			{
+				r.values[j] = rets[j][i];
+			}
+			results2.push_back(r);
+		}
 	}
 	return true;
 }
@@ -199,8 +183,11 @@ class Gu2Calculator {
             params.append(param);
         }
         return params;
-    }
+		}
 		py::array _results() const {
+		if (results.empty()) {
+			throw std::runtime_error("Gu2001 results are unavailable because the calculation did not complete.");
+		}
         // convert results to numpy array
         py::array_t<double, py::array::c_style> arr({results.size(), results[0].values.size()});
         auto buffer = arr.mutable_unchecked<2>();

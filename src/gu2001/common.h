@@ -7,8 +7,6 @@
 #define appname "genePlei"
 
 
-#define version "V1.0"
-
 class summary_t {
 public:
   std::string name;

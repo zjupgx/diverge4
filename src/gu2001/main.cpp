@@ -15,6 +15,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#include <stdexcept>
 namespace py = pybind11;
 //----------------------------------------------------------------------
 
@@ -24,43 +25,18 @@ using namespace std;
 
 bool
 preprocess(vector<string>& names,vector<Tree> &trees,vector<sequence_t> &sequences) {
-	try{
-		if (trees.size()<2){
-			throw std::invalid_argument("Need to create at least two clusters first.");
-		}
+	if (trees.size() < 2) {
+		throw std::invalid_argument("Need to create at least two clusters first.");
 	}
-	catch(const char* &e){
-		cout<<e<<endl;
-	}
-	try{
-		if (sequences.empty()){
-			throw std::invalid_argument("Need to load aligned sequences first.");
-		}
-	}
-	catch(const char* &e){
-		cout<<e<<endl;
+	if (sequences.empty()) {
+		throw std::invalid_argument("Need to load aligned sequences first.");
 	}
 
-	int i;
-	bool trees_branch_zero;
-	trees_branch_zero = false;
-	for( i = 0; i < trees.size(); i++ ) {
-		if(!trees[i].has_branch_length()) {
-			trees_branch_zero = true;
-			break;
+	for (size_t i = 0; i < trees.size(); i++) {
+		if (!trees[i].has_branch_length()) {
+			throw std::runtime_error("Gu2001 method failed. The input trees do not contain branch length!");
 		}
 	}
-	try{
-		if (trees_branch_zero) {
-		throw std::exception("Gu2001 method failed. The input trees do not contain branch length!");
-		//QMessageBox::warning(NULL, "Gu2001 Method", "Gu2001 method failed. The input trees do not contain branch length!");
-		// return;
-		}
-	}
-	catch(const char* &e){
-					cout<<e<<endl;
-			}	
-
 
 	names.resize(trees.size());
 	for (size_t i = 0; i < trees.size(); i++) {
@@ -90,90 +66,68 @@ process(const vector<Tree>& trees,
 	vector<summary_t>& summary2,
 	vector<result_t>& results2) {
 	vector<vector<double> > summary, rets;
-	
-	try
+
+	if (!gu2001_compute(trees, sequences, summary, rets))
 	{
-		if (!gu2001_compute(trees, sequences, summary, rets))
-		{
-			throw std::exception("Error in gu2001_compute module!");
-		}
+		throw std::runtime_error("Error in gu2001_compute module!");
 	}
-	catch (const char *&e)
+
+	if (summary.empty())
 	{
-		cout << e << endl;
+		throw std::runtime_error("Summary is empty.");
 	}
-	
-
-	try
+	else
 	{
-		if (summary.empty())
+		const char *names[4] = {"AlphaML", "ThetaML", "SE Theta", "LRT Theta"};
+
+		size_t nsum = summary[0].size();
+		assert(nsum == 4);
+
+		summary_t s;
+		s.values.resize(summary.size());
+
+		for (size_t i = 0; i < nsum; i++)
 		{
-			throw std::exception("Summary is empty.");
-		}
-		else
-		{
-			const char *names[4] = {"AlphaML", "ThetaML", "SE Theta", "LRT Theta"};
-
-			size_t nsum = summary[0].size();
-			assert(nsum == 4);
-
-			summary_t s;
-			s.values.resize(summary.size());
-
-			for (size_t i = 0; i < nsum; i++)
+			s.name = names[i];
+			for (size_t j = 0; j < summary.size(); j++)
 			{
-				s.name = names[i];
-				for (size_t j = 0; j < summary.size(); j++)
-				{
-					s.values[j] = summary[j][i];
-				}
-				summary2.push_back(s);
+				s.values[j] = summary[j][i];
 			}
+			summary2.push_back(s);
 		}
 	}
-	catch (const char *&e)
+
+	if (rets.empty())
 	{
-		cout << e << endl;
+		throw std::runtime_error("Result is empty.");
 	}
-
-
-	try
+	else
 	{
-		if (rets.empty())
+		size_t i, j, ngroups = names.size();
+		for (i = 0; i < ngroups; i++)
 		{
-			throw std::exception("Result is empty.");
-		}
-		else
-		{
-			size_t i, j, ngroups = names.size();
-			for (i = 0; i < ngroups; i++)
+			for (j = i + 1; j < ngroups; j++)
 			{
-				for (j = i + 1; j < ngroups; j++)
-				{
-					string str = names[i] + '/' + names[j];
-					names2.push_back(str);
-				}
+				string str = names[i] + '/' + names[j];
+				names2.push_back(str);
 			}
 
-			size_t nrets = rets[0].size();
-
-			result_t r;
-			r.values.resize(rets.size());
-
-			for (i = 0; i < nrets; i++)
-			{
-				r.pos = i;
-				for (j = 0; j < rets.size(); j++)
-				{
-					r.values[j] = rets[j][i];
-				}
-				results2.push_back(r);
-			}
 		}
-	}
-	catch (const char *&e)
-	{
-		cout << e << endl;
+
+		size_t nrets = rets[0].size();
+
+		result_t r;
+		r.values.resize(rets.size());
+
+		for (i = 0; i < nrets; i++)
+		{
+			r.pos = i;
+			for (j = 0; j < rets.size(); j++)
+			{
+				r.values[j] = rets[j][i];
+			}
+			results2.push_back(r);
+		}
 	}
 	return true;
 }
@@ -234,8 +188,11 @@ class Gu2Calculator {
             params.append(param);
         }
         return params;
-    }
+		}
 		py::array _results() const {
+		if (results.empty()) {
+			throw std::runtime_error("Gu2001 results are unavailable because the calculation did not complete.");
+		}
         // convert results to numpy array
         py::array_t<double, py::array::c_style> arr({results.size(), results[0].values.size()});
         auto buffer = arr.mutable_unchecked<2>();

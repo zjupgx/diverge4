@@ -1,1 +1,4 @@
 include requirements.txt
+recursive-include src *.cpp *.h
+recursive-include src_linux *.cpp *.h
+recursive-include Tutorial *.md *.ipynb *.aln *.tree

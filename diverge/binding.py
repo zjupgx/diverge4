@@ -969,6 +969,7 @@ class Rvs(BaseAnalysis):
         summary_results.index.name = "Parameters"
         return summary_results
 
+    @property
     def results(self) -> pd.DataFrame:
         """
         Generate detailed results.
@@ -1031,6 +1032,7 @@ class TypeOneAnalysis(BaseAnalysis):
         summary_results.index.name = "Parameters"
         return summary_results
 
+    @property
     def results(self) -> pd.DataFrame:
         """Generate detailed results."""
         columns_names = self.calculator._r_names().copy()
@@ -1041,4 +1043,3 @@ class TypeOneAnalysis(BaseAnalysis):
         )
         results.index.name = "Position"
         return results
-
